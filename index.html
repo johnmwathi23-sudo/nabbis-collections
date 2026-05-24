@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>VOLK — Men's</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+--off-white:#f5f3ef;--stone:#9e9a93;--stone-light:#d4d0c9;--stone-dark:#6b6760;
+--navy:#1b2a3b;--navy-deep:#0f1a27;--navy-mid:#243448;--ink:#0a0f14;--paper:#f8f6f2;
+}
+html{scroll-behavior:smooth;}
+body{background:var(--ink);color:var(--off-white);font-family:'DM Sans',sans-serif;font-weight:300;overflow-x:hidden;cursor:none;}
+.cursor{position:fixed;width:8px;height:8px;background:var(--off-white);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .2s,height .2s,background .2s,border .2s;}
+.cursor.expand{width:36px;height:36px;background:transparent;border:1px solid var(--stone);}
+nav{position:fixed;top:0;left:0;width:100%;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:1.8rem 3.5rem;background:transparent;border-bottom:1px solid transparent;transition:background .4s,border-color .4s,padding .35s;}
+.nav-logo{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.25em;color:var(--off-white);}
+.nav-links{display:flex;gap:2.5rem;}
+.nav-links a{font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;text-decoration:none;color:var(--stone);transition:color .3s;}
+.nav-links a:hover{color:var(--off-white);}
+.nav-right{display:flex;gap:1.5rem;align-items:center;}
+.nav-right a{font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;text-decoration:none;color:var(--stone);transition:color .3s;cursor:none;}
+.nav-right a:hover{color:var(--off-white);}
+nav.scrolled{background:var(--navy-deep);border-bottom:1px solid rgba(155,150,147,.12);padding-top:1.1rem;padding-bottom:1.1rem;}
+nav.scrolled .nav-logo{color:var(--off-white);}
+#hero{height:100vh;display:grid;grid-template-columns:1.1fr .9fr;}
+.hero-img{position:relative;overflow:hidden;}
+.hero-img img{width:100%;height:100%;object-fit:cover;object-position:center top;}
+.hero-img::after{content:'';position:absolute;inset:0;background:linear-gradient(to right,transparent 60%,var(--navy-deep) 100%);}
+.hero-panel{background:var(--navy-deep);display:flex;flex-direction:column;justify-content:center;padding:5rem 4rem;position:relative;}
+.hero-panel::before{content:'';position:absolute;top:3rem;left:0;width:1px;height:60%;background:linear-gradient(to bottom,transparent,var(--stone-dark),transparent);}
+.hero-season{font-size:.6rem;letter-spacing:.4em;text-transform:uppercase;color:var(--stone);margin-bottom:2rem;}
+.hero-title{font-family:'Bebas Neue',sans-serif;font-size:7rem;line-height:.92;color:var(--off-white);margin-bottom:.5rem;}
+.hero-title span{color:var(--stone);display:block;}
+.hero-sub{font-size:.85rem;color:var(--stone);line-height:1.8;max-width:300px;margin:1.8rem 0 3rem;}
+.hero-cta{display:inline-block;font-size:.65rem;letter-spacing:.3em;text-transform:uppercase;color:var(--off-white);text-decoration:none;border:1px solid rgba(245,243,239,.25);padding:.9rem 2.2rem;transition:all .3s;align-self:flex-start;}
+.hero-cta:hover{background:var(--off-white);color:var(--navy-deep);}
+.hero-meta{margin-top:auto;padding-top:3rem;display:flex;gap:3rem;}
+.hero-stat{border-top:1px solid rgba(155,150,147,.2);padding-top:1rem;}
+.hero-stat-num{font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--off-white);letter-spacing:.05em;}
+.hero-stat-label{font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--stone);margin-top:.2rem;}
+.ticker{background:var(--navy);padding:.75rem 0;overflow:hidden;white-space:nowrap;border-top:1px solid rgba(155,150,147,.08);border-bottom:1px solid rgba(155,150,147,.08);}
+.ticker-track{display:inline-flex;animation:ticker 22s linear infinite;}
+.ticker-item{font-size:.6rem;letter-spacing:.35em;text-transform:uppercase;color:var(--stone);padding:0 3rem;}
+.ticker-sep{color:var(--stone-dark);}
+@keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+#collections{background:var(--ink);padding:6rem 3.5rem;}
+.section-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:3rem;}
+.section-label{font-size:.6rem;letter-spacing:.35em;text-transform:uppercase;color:var(--stone);margin-bottom:.6rem;}
+.section-title{font-family:'Bebas Neue',sans-serif;font-size:3.2rem;letter-spacing:.04em;color:var(--off-white);line-height:1;}
+.section-link{font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;color:var(--stone);text-decoration:none;border-bottom:1px solid var(--stone-dark);padding-bottom:.2rem;transition:color .3s,border-color .3s;}
+.section-link:hover{color:var(--off-white);border-color:var(--off-white);}
+.filter-pills{display:flex;gap:.5rem;margin-bottom:3rem;flex-wrap:wrap;}
+.pill{font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;padding:.5rem 1.2rem;border:1px solid rgba(155,150,147,.2);color:var(--stone);background:transparent;cursor:none;transition:all .25s;font-family:'DM Sans',sans-serif;}
+.pill:hover{border-color:var(--stone);color:var(--off-white);}
+.pill.active{background:var(--navy);border-color:var(--navy);color:var(--off-white);}
+.products-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5px;}
+.product-card{position:relative;overflow:hidden;aspect-ratio:3/4;cursor:none;background:var(--navy-mid);}
+.product-card img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .8s cubic-bezier(.25,.46,.45,.94);}
+.product-card:hover img{transform:scale(1.05);}
+.product-card-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(10,15,20,.85) 0%,rgba(10,15,20,.1) 50%,transparent 100%);opacity:0;transition:opacity .4s;}
+.product-card:hover .product-card-overlay{opacity:1;}
+.card-qv{position:absolute;top:50%;left:50%;transform:translate(-50%,-40%);font-size:.6rem;letter-spacing:.3em;text-transform:uppercase;color:var(--off-white);opacity:0;transition:all .35s;white-space:nowrap;}
+.product-card:hover .card-qv{opacity:1;transform:translate(-50%,-50%);}
+.card-tag{position:absolute;top:1.2rem;left:1.2rem;font-size:.55rem;letter-spacing:.25em;text-transform:uppercase;padding:.35rem .8rem;background:var(--navy-deep);color:var(--stone-light);}
+.card-badge{position:absolute;top:1.2rem;right:1.2rem;font-size:.55rem;letter-spacing:.2em;text-transform:uppercase;padding:.35rem .7rem;background:var(--off-white);color:var(--navy-deep);}
+.product-info{padding:1rem 0 .5rem;}
+.product-name{font-size:.85rem;color:var(--off-white);margin-bottom:.3rem;letter-spacing:.02em;}
+.product-meta{display:flex;justify-content:space-between;align-items:center;}
+.product-price{font-size:.75rem;color:var(--stone);}
+.product-cat{font-size:.55rem;letter-spacing:.2em;text-transform:uppercase;color:var(--stone-dark);}
+#trends{background:var(--navy-deep);padding:6rem 0;}
+.trends-header{padding:0 3.5rem;margin-bottom:3rem;display:flex;justify-content:space-between;align-items:flex-end;}
+.trends-scroll{display:flex;gap:1.5px;overflow-x:auto;padding:0 3.5rem;scrollbar-width:none;}
+.trends-scroll::-webkit-scrollbar{display:none;}
+.trend-card{flex:0 0 340px;aspect-ratio:4/5;position:relative;overflow:hidden;cursor:none;}
+.trend-card img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .9s cubic-bezier(.25,.46,.45,.94);}
+.trend-card:hover img{transform:scale(1.04);}
+.trend-card-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(10,15,20,.88) 0%,rgba(10,15,20,.2) 55%,transparent 100%);}
+.trend-content{position:absolute;bottom:0;left:0;right:0;padding:2rem;}
+.trend-num{font-size:.55rem;letter-spacing:.35em;text-transform:uppercase;color:var(--stone);margin-bottom:.8rem;}
+.trend-title{font-family:'Bebas Neue',sans-serif;font-size:2.4rem;color:var(--off-white);line-height:1;margin-bottom:1rem;letter-spacing:.03em;}
+.trend-link{font-size:.6rem;letter-spacing:.25em;text-transform:uppercase;color:var(--stone-light);text-decoration:none;border-bottom:1px solid var(--stone-dark);padding-bottom:.2rem;transition:color .3s;}
+.trend-link:hover{color:var(--off-white);}
+#ethos{display:grid;grid-template-columns:1fr 1fr;background:var(--navy-mid);}
+.ethos-img{position:relative;min-height:560px;overflow:hidden;}
+.ethos-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;}
+.ethos-img::after{content:'';position:absolute;inset:0;background:linear-gradient(to right,transparent 50%,var(--navy-mid) 100%);}
+.ethos-content{padding:6rem 4.5rem;display:flex;flex-direction:column;justify-content:center;}
+.ethos-line{width:32px;height:1px;background:var(--stone-dark);margin-bottom:2.5rem;}
+.ethos-title{font-family:'Bebas Neue',sans-serif;font-size:4rem;color:var(--off-white);line-height:.95;margin-bottom:2rem;letter-spacing:.03em;}
+.ethos-title em{font-family:'DM Sans',sans-serif;font-style:italic;font-weight:300;font-size:1.1rem;display:block;color:var(--stone);letter-spacing:.05em;margin-bottom:.5rem;}
+.ethos-body{font-size:.85rem;color:var(--stone);line-height:1.9;max-width:360px;margin-bottom:2.5rem;}
+.ethos-cta{font-size:.65rem;letter-spacing:.25em;text-transform:uppercase;color:var(--off-white);text-decoration:none;border-bottom:1px solid var(--stone-dark);padding-bottom:.3rem;align-self:flex-start;transition:border-color .3s;}
+.ethos-cta:hover{border-color:var(--off-white);}
+#newsletter{background:var(--ink);padding:6rem 3.5rem;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;border-top:1px solid rgba(155,150,147,.08);}
+.nl-eyebrow{font-size:.6rem;letter-spacing:.35em;text-transform:uppercase;color:var(--stone);margin-bottom:1rem;}
+.nl-title{font-family:'Bebas Neue',sans-serif;font-size:3.5rem;color:var(--off-white);line-height:.95;letter-spacing:.03em;}
+.nl-sub{font-size:.8rem;color:var(--stone);line-height:1.8;margin-top:1.2rem;}
+.nl-form{display:flex;flex-direction:column;gap:1.2rem;}
+.nl-row{display:flex;border-bottom:1px solid rgba(155,150,147,.2);padding-bottom:.8rem;}
+.nl-input{flex:1;background:transparent;border:none;outline:none;font-family:'DM Sans',sans-serif;font-size:.8rem;letter-spacing:.1em;color:var(--off-white);padding:.4rem 0;caret-color:var(--stone);}
+.nl-input::placeholder{color:var(--stone-dark);}
+.nl-btn{background:transparent;border:1px solid rgba(155,150,147,.3);color:var(--stone-light);font-family:'DM Sans',sans-serif;font-size:.6rem;letter-spacing:.3em;text-transform:uppercase;padding:.9rem 2rem;cursor:none;transition:all .3s;align-self:flex-start;}
+.nl-btn:hover{background:var(--navy);border-color:var(--navy);color:var(--off-white);}
+.nl-note{font-size:.6rem;color:var(--stone-dark);letter-spacing:.05em;}
+footer{background:var(--navy-deep);padding:3.5rem;display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:3rem;border-top:1px solid rgba(155,150,147,.08);}
+.footer-brand{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:.2em;color:var(--off-white);margin-bottom:.8rem;}
+.footer-tag{font-size:.72rem;color:var(--stone-dark);line-height:1.8;}
+.footer-col-title{font-size:.58rem;letter-spacing:.35em;text-transform:uppercase;color:var(--stone);margin-bottom:1.2rem;}
+.footer-links{display:flex;flex-direction:column;gap:.7rem;}
+.footer-links a{font-size:.75rem;color:var(--stone-dark);text-decoration:none;transition:color .2s;}
+.footer-links a:hover{color:var(--off-white);}
+.footer-bottom{background:var(--navy-deep);padding:1.2rem 3.5rem;border-top:1px solid rgba(155,150,147,.07);display:flex;justify-content:space-between;}
+.footer-copy{font-size:.58rem;letter-spacing:.12em;color:var(--stone-dark);}
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .8s cubic-bezier(.25,.46,.45,.94),transform .8s cubic-bezier(.25,.46,.45,.94);}
+.reveal.visible{opacity:1;transform:translateY(0);}
+</style>
+</head>
+<body>
+<div class="cursor" id="cursor"></div>
+<nav id="main-nav">
+  <div class="nav-logo">VOLK</div>
+  <div class="nav-links">
+    <a href="#collections">Collections</a>
+    <a href="#trends">Trends</a>
+    <a href="#ethos">About</a>
+  </div>
+  <div class="nav-right">
+    <a href="#">Search</a>
+    <a href="#">Bag (0)</a>
+  </div>
+</nav>
+<section id="hero">
+  <div class="hero-img">
+    <img src="https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?w=900&q=80" alt="Hero"/>
+  </div>
+  <div class="hero-panel">
+    <div class="hero-season">FW 2025 — New Season</div>
+    <div class="hero-title">BUILT<span>FOR MEN</span></div>
+    <p class="hero-sub">Precision-cut. Purposefully minimal. Clothing that works as hard as you do — from first light to last call.</p>
+    <a href="#collections" class="hero-cta">Shop the Collection</a>
+    <div class="hero-meta">
+      <div class="hero-stat"><div class="hero-stat-num">120+</div><div class="hero-stat-label">Pieces</div></div>
+      <div class="hero-stat"><div class="hero-stat-num">6</div><div class="hero-stat-label">Categories</div></div>
+      <div class="hero-stat"><div class="hero-stat-num">FW25</div><div class="hero-stat-label">Season</div></div>
+    </div>
+  </div>
+</section>
+<div class="ticker">
+  <div class="ticker-track">
+    <span class="ticker-item">New Season FW 2025 <span class="ticker-sep">·</span></span>
+    <span class="ticker-item">Free Shipping Over $150 <span class="ticker-sep">·</span></span>
+    <span class="ticker-item">Outerwear Now Live <span class="ticker-sep">·</span></span>
+    <span class="ticker-item">VOLK Man <span class="ticker-sep">·</span></span>
+    <span class="ticker-item">New Arrivals Weekly <span class="ticker-sep">·</span></span>
+    <span class="ticker-item">New Season FW 2025 <span class="ticker-sep">·</span></span>
+    <span class="ticker-item">Free Shipping Over $150 <span class="ticker-sep">·</span></span>
+    <span class="ticker-item">Outerwear Now Live <span class="ticker-sep">·</span></span>
+    <span class="ticker-item">VOLK Man <span class="ticker-sep">·</span></span>
+    <span class="ticker-item">New Arrivals Weekly <span class="ticker-sep">·</span></span>
+  </div>
+</div>
+<section id="collections">
+  <div class="section-head reveal">
+    <div>
+      <div class="section-label">The Range</div>
+      <div class="section-title">ALL COLLECTIONS</div>
+    </div>
+    <a href="#" class="section-link">View All</a>
+  </div>
+  <div class="filter-pills reveal" id="filters">
+    <button class="pill active" data-cat="all">All</button>
+    <button class="pill" data-cat="outerwear">Outerwear</button>
+    <button class="pill" data-cat="tops">Tops</button>
+    <button class="pill" data-cat="trousers">Trousers</button>
+    <button class="pill" data-cat="footwear">Footwear</button>
+    <button class="pill" data-cat="accessories">Accessories</button>
+  </div>
+  <div class="products-grid reveal" id="products-grid">
+    <div data-cat="outerwear">
+      <div class="product-card">
+        <img src="https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?w=700&q=80" alt="Field Coat"/>
+        <div class="card-tag">Outerwear</div><div class="card-badge">New</div>
+        <div class="product-card-overlay"></div><div class="card-qv">Quick View</div>
+      </div>
+      <div class="product-info">
+        <div class="product-name">Field Utility Coat</div>
+        <div class="product-meta"><div class="product-price">$385</div><div class="product-cat">Outerwear</div></div>
+      </div>
+    </div>
+    <div data-cat="tops">
+      <div class="product-card">
+        <img src="https://images.unsplash.com/photo-1598033129183-c4f50c736f10?w=700&q=80" alt="Washed Tee"/>
+        <div class="card-tag">Tops</div>
+        <div class="product-card-overlay"></div><div class="card-qv">Quick View</div>
+      </div>
+      <div class="product-info">
+        <div class="product-name">Washed Heavyweight Tee</div>
+        <div class="product-meta"><div class="product-price">$68</div><div class="product-cat">Tops</div></div>
+      </div>
+    </div>
+    <div data-cat="trousers">
+      <div class="product-card">
+        <img src="https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=700&q=80" alt="Cargo Trouser"/>
+        <div class="card-tag">Trousers</div><div class="card-badge">Bestseller</div>
+        <div class="product-card-overlay"></div><div class="card-qv">Quick View</div>
+      </div>
+      <div class="product-info">
+        <div class="product-name">Tapered Cargo Trouser</div>
+        <div class="product-meta"><div class="product-price">$175</div><div class="product-cat">Trousers</div></div>
+      </div>
+    </div>
+    <div data-cat="outerwear">
+      <div class="product-card">
+        <img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=700&q=80" alt="Bomber"/>
+        <div class="card-tag">Outerwear</div>
+        <div class="product-card-overlay"></div><div class="card-qv">Quick View</div>
+      </div>
+      <div class="product-info">
+        <div class="product-name">MA-1 Satin Bomber</div>
+        <div class="product-meta"><div class="product-price">$310</div><div class="product-cat">Outerwear</div></div>
+      </div>
+    </div>
+    <div data-cat="footwear">
+      <div class="product-card">
+        <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=700&q=80" alt="Runner"/>
+        <div class="card-tag">Footwear</div><div class="card-badge">New</div>
+        <div class="product-card-overlay"></div><div class="card-qv">Quick View</div>
+      </div>
+      <div class="product-info">
+        <div class="product-name">Low Profile Runner</div>
+        <div class="product-meta"><div class="product-price">$220</div><div class="product-cat">Footwear</div></div>
+      </div>
+    </div>
+    <div data-cat="tops">
+      <div class="product-card">
+        <img src="https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=700&q=80" alt="Thermal Knit"/>
+        <div class="card-tag">Tops</div>
+        <div class="product-card-overlay"></div><div class="card-qv">Quick View</div>
+      </div>
+      <div class="product-info">
+        <div class="product-name">Ribbed Thermal Knit</div>
+        <div class="product-meta"><div class="product-price">$120</div><div class="product-cat">Tops</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+<section id="trends">
+  <div class="trends-header reveal">
+    <div><div class="section-label">What's Moving</div><div class="section-title">TRENDING NOW</div></div>
+    <a href="#" class="section-link">All Trends</a>
+  </div>
+  <div class="trends-scroll reveal">
+    <div class="trend-card">
+      <img src="https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?w=800&q=80" alt="Utility Layer"/>
+      <div class="trend-card-overlay"></div>
+      <div class="trend-content"><div class="trend-num">01</div><div class="trend-title">THE UTILITY LAYER</div><a href="#" class="trend-link">Shop the Look</a></div>
+    </div>
+    <div class="trend-card">
+      <img src="https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=800&q=80" alt="Monochrome Stack"/>
+      <div class="trend-card-overlay"></div>
+      <div class="trend-content"><div class="trend-num">02</div><div class="trend-title">MONOCHROME STACK</div><a href="#" class="trend-link">Shop the Look</a></div>
+    </div>
+    <div class="trend-card">
+      <img src="https://images.unsplash.com/photo-1520013817300-1f4c1cb245ef?w=800&q=80" alt="Raw Denim"/>
+      <div class="trend-card-overlay"></div>
+      <div class="trend-content"><div class="trend-num">03</div><div class="trend-title">RAW DENIM EDIT</div><a href="#" class="trend-link">Shop the Look</a></div>
+    </div>
+    <div class="trend-card">
+      <img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=800&q=80" alt="Technical"/>
+      <div class="trend-card-overlay"></div>
+      <div class="trend-content"><div class="trend-num">04</div><div class="trend-title">TECH OUTERWEAR</div><a href="#" class="trend-link">Shop the Look</a></div>
+    </div>
+  </div>
+</section>
+<section id="ethos">
+  <div class="ethos-img">
+    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=900&q=80" alt="Ethos"/>
+  </div>
+  <div class="ethos-content reveal">
+    <div class="ethos-line"></div>
+    <div class="ethos-title"><em>Built for the man</em>WHO MOVES<br>WITHOUT<br>NOISE</div>
+    <p class="ethos-body">VOLK was founded on a single idea — that a man's clothes should never work against him. No excess. No performance. Just garments engineered for modern life, made to outlast the trends around them.</p>
+    <a href="#" class="ethos-cta">Our Story</a>
+  </div>
+</section>
+<section id="newsletter">
+  <div class="reveal">
+    <div class="nl-eyebrow">Stay in the loop</div>
+    <div class="nl-title">FIRST TO<br>KNOW.</div>
+    <p class="nl-sub">New drops, exclusive edits, and seasonal lookbooks — straight to your inbox. No noise.</p>
+  </div>
+  <div class="nl-form reveal">
+    <div class="nl-row"><input type="text" class="nl-input" placeholder="Your name"/></div>
+    <div class="nl-row"><input type="email" class="nl-input" placeholder="Email address"/></div>
+    <button class="nl-btn">Subscribe</button>
+    <p class="nl-note">One email per drop. Unsubscribe anytime.</p>
+  </div>
+</section>
+<footer>
+  <div><div class="footer-brand">VOLK</div><p class="footer-tag">Men's clothing.<br>Built to last.</p></div>
+  <div>
+    <div class="footer-col-title">Shop</div>
+    <div class="footer-links"><a href="#">New Arrivals</a><a href="#">Outerwear</a><a href="#">Tops</a><a href="#">Trousers</a><a href="#">Footwear</a></div>
+  </div>
+  <div>
+    <div class="footer-col-title">Brand</div>
+    <div class="footer-links"><a href="#">Our Story</a><a href="#">Stockists</a><a href="#">Careers</a><a href="#">Press</a></div>
+  </div>
+  <div>
+    <div class="footer-col-title">Follow</div>
+    <div class="footer-links"><a href="#">Instagram</a><a href="#">TikTok</a><a href="#">Pinterest</a><a href="#">Newsletter</a></div>
+  </div>
+</footer>
+<div class="footer-bottom">
+  <span class="footer-copy">© 2025 VOLK. All rights reserved.</span>
+  <span class="footer-copy">Privacy · Terms · Cookies</span>
+</div>
+<script>
+const cur=document.getElementById('cursor');
+let mx=0,my=0,cx=0,cy=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
+(function loop(){cx+=(mx-cx)*.13;cy+=(my-cy)*.13;cur.style.left=cx+'px';cur.style.top=cy+'px';requestAnimationFrame(loop);})();
+document.querySelectorAll('a,button,.product-card,.trend-card').forEach(el=>{
+  el.addEventListener('mouseenter',()=>cur.classList.add('expand'));
+  el.addEventListener('mouseleave',()=>cur.classList.remove('expand'));
+});
+const nav=document.getElementById('main-nav');
+window.addEventListener('scroll',()=>{nav.classList.toggle('scrolled',window.scrollY>10);},{passive:true});
+const obs=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');}),{threshold:.08});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+document.querySelectorAll('.pill').forEach(pill=>{
+  pill.addEventListener('click',function(){
+    document.querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));
+    this.classList.add('active');
+    const cat=this.dataset.cat;
+    document.querySelectorAll('#products-grid > div').forEach(card=>{
+      card.style.display=(cat==='all'||card.dataset.cat===cat)?'block':'none';
+    });
+  });
+});
+</script>
+</body>
+</html>
