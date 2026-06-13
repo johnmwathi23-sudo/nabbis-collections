@@ -61,14 +61,14 @@ export default function ContactPage() {
                   <div className="w-10 h-10 bg-lavender-bg rounded-lg flex items-center justify-center shrink-0 text-lg">📞</div>
                   <div>
                     <h3 className="font-semibold text-sm">Phone</h3>
-                    <p className="text-sm text-gray-600">+254 700 000 000</p>
+                    <p className="text-sm text-gray-600">+254 758 516135 / +254 720 144325</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
                   <div className="w-10 h-10 bg-lavender-bg rounded-lg flex items-center justify-center shrink-0 text-lg">💬</div>
                   <div>
                     <h3 className="font-semibold text-sm">WhatsApp</h3>
-                    <a href="https://wa.me/254700000000" target="_blank" rel="noopener noreferrer" className="text-sm text-purple-primary hover:underline">+254 700 000 000</a>
+                    <a href="https://chat.whatsapp.com/L2ZQwAUbsL16HLuIEeNGCK" target="_blank" rel="noopener noreferrer" className="text-sm text-purple-primary hover:underline">Join WhatsApp Channel</a>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">

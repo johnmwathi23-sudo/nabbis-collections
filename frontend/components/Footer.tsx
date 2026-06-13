@@ -46,7 +46,8 @@ export default function Footer() {
           <div>
             <h4 className="text-white text-sm font-semibold uppercase tracking-wider mb-4">Contact</h4>
             <ul className="space-y-2 text-sm">
-              <li>+254 700 000 000</li>
+              <li>+254 758 516135</li>
+              <li>+254 720 144325</li>
               <li>info@nabbiscollections.co.ke</li>
               <li>Nairobi, Kenya</li>
             </ul>
@@ -65,7 +66,7 @@ export default function Footer() {
       </div>
       {/* WhatsApp Float */}
       <a
-        href="https://wa.me/254700000000?text=Hello%20Nabbis%20Collections!%20I%20have%20a%20question%20about..."
+        href="https://chat.whatsapp.com/L2ZQwAUbsL16HLuIEeNGCK"
         target="_blank"
         rel="noopener noreferrer"
         className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-[#25D366] text-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform"
