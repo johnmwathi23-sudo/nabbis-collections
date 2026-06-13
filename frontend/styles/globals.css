@@ -1,0 +1,58 @@
+@import "tailwindcss";
+
+@theme {
+  --color-purple-deep: #3B0764;
+  --color-purple-primary: #5B21B6;
+  --color-purple-medium: #7C3AED;
+  --color-purple-light: #A78BFA;
+  --color-lavender: #C4B5FD;
+  --color-lavender-light: #DDD6FE;
+  --color-lavender-bg: #F3E8FF;
+  --color-gold: #D97706;
+  --color-gold-light: #FCD34D;
+
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-serif: 'Playfair Display', Georgia, serif;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply font-sans text-gray-900 antialiased;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif font-bold;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-purple-primary text-white font-semibold rounded-lg transition-all duration-200 hover:bg-purple-deep;
+  }
+  .btn-gold {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-gold text-white font-semibold rounded-lg transition-all duration-200 hover:bg-amber-700;
+  }
+  .btn-outline {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 border-2 border-purple-primary text-purple-primary font-semibold rounded-lg transition-all duration-200 hover:bg-purple-primary hover:text-white;
+  }
+  .btn-white {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-purple-primary font-semibold rounded-lg transition-all duration-200 hover:bg-lavender-bg;
+  }
+  .section-title {
+    @apply font-serif text-3xl md:text-4xl font-bold text-gray-900 text-center;
+  }
+  .section-subtitle {
+    @apply text-lg text-gray-600 text-center max-w-2xl mx-auto;
+  }
+  .container-nabbis {
+    @apply mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl;
+  }
+  .section-padding {
+    @apply py-16 md:py-24;
+  }
+  .input-nabbis {
+    @apply px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-primary focus:border-transparent bg-white;
+  }
+}

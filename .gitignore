@@ -1,0 +1,36 @@
+# WordPress
+wordpress/wp-content/uploads/
+wordpress/wp-content/cache/
+wordpress/wp-content/upgrade/
+wordpress/wp-config.php
+wordpress/.htaccess
+
+# Next.js
+frontend/.next/
+frontend/out/
+frontend/node_modules/
+
+# Environment
+.env
+.env.local
+.env.production
+
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+
+# IDE
+.vscode/
+.idea/
+*.sublime-*
+
+# Logs
+*.log
+wp-content/debug.log
+
+# Docker
+docker/.data/
+
+# Misc
+node_modules/

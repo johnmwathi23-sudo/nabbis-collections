@@ -1,0 +1,25 @@
+<!-- wp:template-part {"slug":"header","tagName":"header"} /-->
+
+<!-- wp:group {"tagName":"main","layout":{"type":"constrained"}} -->
+<main class="wp-block-group">
+  <!-- wp:group {"className":"nabbis-page-header"} -->
+  <div class="wp-block-group nabbis-page-header">
+    <!-- wp:heading {"textAlign":"center"} -->
+    <h1 class="has-text-align-center">Sale</h1>
+    <!-- /wp:heading -->
+    <!-- wp:paragraph {"align":"center","className":"nabbis-section-subtitle"} -->
+    <p class="has-text-align-center nabbis-section-subtitle">Great deals on premium products - limited time only</p>
+    <!-- /wp:paragraph -->
+  </div>
+  <!-- /wp:group -->
+
+  <!-- wp:group {"className":"nabbis-container"} -->
+  <div class="wp-block-group nabbis-container">
+    <!-- wp:woocommerce/store-notices /-->
+    <!-- wp:woocommerce/product-collection {"query":{"perPage":24,"pages":0,"offset":0,"postType":"product","order":"asc","orderBy":"title","search":"","exclude":[],"inherit":false,"taxQuery":[],"isProductCollectionBlock":true,"woocommerceOnSale":["yes"]}} /-->
+  </div>
+  <!-- /wp:group -->
+</main>
+<!-- /wp:group -->
+
+<!-- wp:template-part {"slug":"footer","tagName":"footer"} /-->
