@@ -1,11 +1,13 @@
 import { getAdminClient } from '@/lib/supabase/admin-client';
 import type { Product, Category, Order, Profile, DeliveryZone, HeroSlide, SiteSetting } from '@/lib/types';
 
+const db = () => getAdminClient() as any;
+
 // ============================================================
 // DASHBOARD STATS
 // ============================================================
 export async function getDashboardStats() {
-  const supabase = getAdminClient();
+  const supabase = db();
 
   const [ordersResult, productsResult, customersResult, revenueResult] = await Promise.all([
     supabase.from('orders').select('id, status, total, created_at'),
@@ -49,7 +51,7 @@ export async function getDashboardStats() {
 }
 
 export async function getRecentOrders(limit = 10) {
-  const supabase = getAdminClient();
+  const supabase = db();
   const { data, error } = await supabase
     .from('orders')
     .select('*, profiles:customer_id(email, first_name, last_name)')
@@ -61,7 +63,7 @@ export async function getRecentOrders(limit = 10) {
 }
 
 export async function getRevenueChartData(days = 30) {
-  const supabase = getAdminClient();
+  const supabase = db();
   const since = new Date();
   since.setDate(since.getDate() - days);
 
@@ -97,7 +99,7 @@ export async function getAdminProducts(params?: {
   is_active?: boolean;
   on_sale?: boolean;
 }) {
-  const supabase = getAdminClient();
+  const supabase = db();
   const page = params?.page || 1;
   const perPage = Math.min(params?.per_page || 25, 100);
   const from = (page - 1) * perPage;
@@ -129,7 +131,7 @@ export async function getAdminProducts(params?: {
 }
 
 export async function getAdminProduct(id: string) {
-  const supabase = getAdminClient();
+  const supabase = db();
   const { data, error } = await supabase
     .from('products')
     .select('*, categories(*)')
@@ -144,7 +146,7 @@ export async function getAdminProduct(id: string) {
 // CATEGORIES
 // ============================================================
 export async function getAdminCategories() {
-  const supabase = getAdminClient();
+  const supabase = db();
   const { data, error } = await supabase
     .from('categories')
     .select('*, products:products(count)')
@@ -164,7 +166,7 @@ export async function getAdminOrders(params?: {
   payment_status?: string;
   search?: string;
 }) {
-  const supabase = getAdminClient();
+  const supabase = db();
   const page = params?.page || 1;
   const perPage = Math.min(params?.per_page || 25, 100);
   const from = (page - 1) * perPage;
@@ -191,7 +193,7 @@ export async function getAdminOrders(params?: {
 }
 
 export async function getAdminOrder(id: string) {
-  const supabase = getAdminClient();
+  const supabase = db();
   const { data, error } = await supabase
     .from('orders')
     .select('*, order_items(*), profiles:customer_id(*)')
@@ -211,7 +213,7 @@ export async function getAdminCustomers(params?: {
   search?: string;
   role?: string;
 }) {
-  const supabase = getAdminClient();
+  const supabase = db();
   const page = params?.page || 1;
   const perPage = Math.min(params?.per_page || 25, 100);
   const from = (page - 1) * perPage;
@@ -240,7 +242,7 @@ export async function getAdminCustomers(params?: {
 // HERO SLIDES
 // ============================================================
 export async function getHeroSlides() {
-  const supabase = getAdminClient();
+  const supabase = db();
   const { data, error } = await supabase
     .from('hero_slides')
     .select('*')
@@ -251,7 +253,7 @@ export async function getHeroSlides() {
 }
 
 export async function getActiveHeroSlides() {
-  const supabase = getAdminClient();
+  const supabase = db();
   const now = new Date().toISOString();
   const { data, error } = await supabase
     .from('hero_slides')
@@ -269,7 +271,7 @@ export async function getActiveHeroSlides() {
 // SITE SETTINGS
 // ============================================================
 export async function getSiteSettings() {
-  const supabase = getAdminClient();
+  const supabase = db();
   const { data, error } = await supabase
     .from('site_settings')
     .select('*')
@@ -280,7 +282,7 @@ export async function getSiteSettings() {
 }
 
 export async function getSiteSetting(key: string) {
-  const supabase = getAdminClient();
+  const supabase = db();
   const { data, error } = await supabase
     .from('site_settings')
     .select('*')
