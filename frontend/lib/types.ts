@@ -47,9 +47,11 @@ export interface Profile {
   first_name: string | null;
   last_name: string | null;
   phone: string | null;
+  role: 'customer' | 'admin' | 'super_admin';
   shipping_address: Address;
   billing_address: Address;
   loyalty_points: number;
+  created_at: string;
 }
 
 export interface Address {
@@ -95,6 +97,61 @@ export interface Order {
   coupon_code: string | null;
   items?: OrderItem[];
   created_at: string;
+}
+
+export interface HeroSlide {
+  id: string;
+  title: string;
+  subtitle: string | null;
+  cta_text: string | null;
+  cta_link: string | null;
+  desktop_image_url: string | null;
+  mobile_image_url: string | null;
+  overlay_opacity: number;
+  text_color: string;
+  bg_color: string;
+  sort_order: number;
+  is_active: boolean;
+  scheduled_from: string | null;
+  scheduled_to: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SiteSetting {
+  id: string;
+  key: string;
+  value: any;
+  description: string | null;
+  updated_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AdminAuditLog {
+  id: string;
+  admin_id: string;
+  action: 'create' | 'update' | 'delete';
+  entity: 'product' | 'category' | 'order' | 'profile' | 'site_setting' | 'hero_slide' | 'delivery_zone' | 'user_role';
+  entity_id: string | null;
+  changes: any;
+  ip_address: string | null;
+  user_agent: string | null;
+  created_at: string;
+}
+
+export interface DashboardStats {
+  totalOrders: number;
+  pendingOrders: number;
+  processingOrders: number;
+  completedOrders: number;
+  cancelledOrders: number;
+  totalRevenue: number;
+  recentRevenue: number;
+  totalProducts: number;
+  activeProducts: number;
+  totalCustomers: number;
+  recentOrders: number;
 }
 
 export interface OrderItem {

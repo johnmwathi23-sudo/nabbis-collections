@@ -10,32 +10,81 @@ import {
   getOnSaleProducts,
   getCategories,
 } from "@/lib/woocommerce";
+import { createServerClient } from "@/lib/supabase";
+
+async function getHeroSlides() {
+  try {
+    const supabase = createServerClient();
+    const now = new Date().toISOString();
+    const { data } = await supabase
+      .from("hero_slides")
+      .select("*")
+      .eq("is_active", true)
+      .or(`scheduled_from.is.null,scheduled_from.lte.${now}`)
+      .or(`scheduled_to.is.null,scheduled_to.gte.${now}`)
+      .order("sort_order", { ascending: true });
+
+    return (data as any[]) || [];
+  } catch {
+    return [];
+  }
+}
 
 export default async function HomePage() {
-  const [featured, newArrivals, saleProducts, categories] = await Promise.all([
+  const [featured, newArrivals, saleProducts, categories, heroSlides] = await Promise.all([
     getFeaturedProducts(),
     getNewArrivals(),
     getOnSaleProducts(),
     getCategories(),
+    getHeroSlides(),
   ]);
+
+  const defaultHero = {
+    title: "Premium Fashion & Lifestyle<br />for Kenya",
+    subtitle: "Discover curated collections of fashion, bags, and home essentials delivered to your doorstep.",
+    cta_text: "Shop Now",
+    cta_link: "/shop",
+    desktop_image_url: null,
+    bg_color: "#3B0764",
+    overlay_opacity: 0.4,
+  };
+
+  const hero = heroSlides.length > 0 ? heroSlides[0] : defaultHero;
 
   return (
     <>
       <Header />
       <main>
         {/* Hero */}
-        <section className="relative min-h-[85vh] flex items-center bg-purple-deep overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-deep/90 via-purple-primary/70 to-purple-medium/50 z-10" />
+        <section className="relative min-h-[85vh] flex items-center overflow-hidden" style={{ backgroundColor: hero.bg_color || "#3B0764" }}>
+          {hero.desktop_image_url && (
+            <img src={hero.desktop_image_url} alt="" className="absolute inset-0 w-full h-full object-cover" />
+          )}
+          <div
+            className="absolute inset-0 z-10"
+            style={{
+              background: hero.desktop_image_url
+                ? `linear-gradient(to bottom right, rgba(59,7,100,${hero.overlay_opacity + 0.4}), rgba(91,33,182,${hero.overlay_opacity + 0.2}))`
+                : "linear-gradient(to bottom right, rgba(59,7,100,0.9), rgba(91,33,182,0.7), rgba(124,58,237,0.5))"
+            }}
+          />
           <div className="container-nabbis relative z-20 py-20">
-            <h1 className="font-serif text-4xl md:text-6xl lg:text-7xl font-extrabold text-white leading-tight mb-6 max-w-2xl">
-              Premium Fashion &amp; Lifestyle<br />for Kenya
-            </h1>
-            <p className="text-lg md:text-xl text-white/80 mb-8 max-w-xl">
-              Discover curated collections of fashion, bags, and home essentials delivered to your doorstep.
-            </p>
+            <h1
+              className="font-serif text-4xl md:text-6xl lg:text-7xl font-extrabold leading-tight mb-6 max-w-2xl"
+              style={{ color: hero.text_color || "#FFFFFF" }}
+              dangerouslySetInnerHTML={{ __html: hero.title }}
+            />
+            {hero.subtitle && (
+              <p
+                className="text-lg md:text-xl mb-8 max-w-xl"
+                style={{ color: hero.text_color ? `${hero.text_color}cc` : "rgba(255,255,255,0.8)" }}
+              >
+                {hero.subtitle}
+              </p>
+            )}
             <div className="flex gap-4 flex-wrap">
-              <Link href="/shop" className="btn-gold text-base px-8 py-4">
-                Shop Now
+              <Link href={hero.cta_link || "/shop"} className="btn-gold text-base px-8 py-4">
+                {hero.cta_text || "Shop Now"}
               </Link>
               <Link href="/shop?orderby=date" className="inline-flex items-center justify-center px-8 py-4 border-2 border-white text-white font-semibold rounded-lg hover:bg-white/10 transition-all">
                 New Arrivals
