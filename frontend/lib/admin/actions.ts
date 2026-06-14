@@ -1,11 +1,13 @@
 import { getAdminClient } from '@/lib/supabase/admin-client';
 import { logAudit } from './audit';
 
+const db = () => getAdminClient() as any;
+
 // ============================================================
 // PRODUCTS
 // ============================================================
 export async function createProduct(data: any, adminId: string) {
-  const supabase = getAdminClient();
+  const supabase = db();
   const { data: product, error } = await supabase
     .from('products')
     .insert(data)
@@ -26,7 +28,7 @@ export async function createProduct(data: any, adminId: string) {
 }
 
 export async function updateProduct(id: string, data: any, adminId: string) {
-  const supabase = getAdminClient();
+  const supabase = db();
   const { data: oldProduct, error: fetchError } = await supabase
     .from('products')
     .select('*')
@@ -56,7 +58,7 @@ export async function updateProduct(id: string, data: any, adminId: string) {
 }
 
 export async function deleteProduct(id: string, adminId: string) {
-  const supabase = getAdminClient();
+  const supabase = db();
   const { data: product, error: fetchError } = await supabase
     .from('products')
     .select('name')
@@ -78,7 +80,7 @@ export async function deleteProduct(id: string, adminId: string) {
 }
 
 export async function bulkDeleteProducts(ids: string[], adminId: string) {
-  const supabase = getAdminClient();
+  const supabase = db();
   const { error } = await supabase
     .from('products')
     .delete()
@@ -96,7 +98,7 @@ export async function bulkUpdateProducts(
   updates: Record<string, any>,
   adminId: string
 ) {
-  const supabase = getAdminClient();
+  const supabase = db();
   const { error } = await supabase
     .from('products')
     .update(updates)
@@ -113,7 +115,7 @@ export async function bulkUpdateProducts(
 // CATEGORIES
 // ============================================================
 export async function createCategory(data: any, adminId: string) {
-  const supabase = getAdminClient();
+  const supabase = db();
   const { data: category, error } = await supabase
     .from('categories')
     .insert(data)
@@ -127,7 +129,7 @@ export async function createCategory(data: any, adminId: string) {
 }
 
 export async function updateCategory(id: string, data: any, adminId: string) {
-  const supabase = getAdminClient();
+  const supabase = db();
   const { data: category, error } = await supabase
     .from('categories')
     .update(data)
@@ -142,7 +144,7 @@ export async function updateCategory(id: string, data: any, adminId: string) {
 }
 
 export async function deleteCategory(id: string, adminId: string) {
-  const supabase = getAdminClient();
+  const supabase = db();
   const { error } = await supabase.from('categories').delete().eq('id', id);
   if (error) throw new Error(error.message);
 
@@ -150,7 +152,7 @@ export async function deleteCategory(id: string, adminId: string) {
 }
 
 export async function reorderCategories(items: { id: string; sort_order: number }[], adminId: string) {
-  const supabase = getAdminClient();
+  const supabase = db();
   for (const item of items) {
     const { error } = await supabase
       .from('categories')
@@ -166,7 +168,7 @@ export async function reorderCategories(items: { id: string; sort_order: number 
 // ORDERS
 // ============================================================
 export async function updateOrderStatus(id: string, status: string, adminId: string) {
-  const supabase = getAdminClient();
+  const supabase = db();
   const { data: order, error } = await supabase
     .from('orders')
     .update({ status })
@@ -181,7 +183,7 @@ export async function updateOrderStatus(id: string, status: string, adminId: str
 }
 
 export async function updatePaymentStatus(id: string, paymentStatus: string, mpesaReceipt?: string, adminId?: string) {
-  const supabase = getAdminClient();
+  const supabase = db();
   const update: any = { payment_status: paymentStatus };
   if (mpesaReceipt) update.mpesa_receipt = mpesaReceipt;
 
@@ -197,7 +199,7 @@ export async function updatePaymentStatus(id: string, paymentStatus: string, mpe
 // HERO SLIDES
 // ============================================================
 export async function createHeroSlide(data: any, adminId: string) {
-  const supabase = getAdminClient();
+  const supabase = db();
   const { data: slide, error } = await supabase
     .from('hero_slides')
     .insert(data)
@@ -211,7 +213,7 @@ export async function createHeroSlide(data: any, adminId: string) {
 }
 
 export async function updateHeroSlide(id: string, data: any, adminId: string) {
-  const supabase = getAdminClient();
+  const supabase = db();
   const { data: slide, error } = await supabase
     .from('hero_slides')
     .update(data)
@@ -226,7 +228,7 @@ export async function updateHeroSlide(id: string, data: any, adminId: string) {
 }
 
 export async function deleteHeroSlide(id: string, adminId: string) {
-  const supabase = getAdminClient();
+  const supabase = db();
   const { error } = await supabase.from('hero_slides').delete().eq('id', id);
   if (error) throw new Error(error.message);
 
@@ -234,7 +236,7 @@ export async function deleteHeroSlide(id: string, adminId: string) {
 }
 
 export async function reorderHeroSlides(items: { id: string; sort_order: number }[], adminId: string) {
-  const supabase = getAdminClient();
+  const supabase = db();
   for (const item of items) {
     const { error } = await supabase
       .from('hero_slides')
@@ -250,7 +252,7 @@ export async function reorderHeroSlides(items: { id: string; sort_order: number 
 // SITE SETTINGS
 // ============================================================
 export async function updateSiteSetting(key: string, value: any, adminId: string) {
-  const supabase = getAdminClient();
+  const supabase = db();
   const { data, error } = await supabase
     .from('site_settings')
     .upsert({ key, value, updated_by: adminId }, { onConflict: 'key' })
@@ -267,7 +269,7 @@ export async function updateSiteSetting(key: string, value: any, adminId: string
 // PROFILE / USER MANAGEMENT
 // ============================================================
 export async function updateUserRole(userId: string, role: string, adminId: string) {
-  const supabase = getAdminClient();
+  const supabase = db();
   const { data, error } = await supabase
     .from('profiles')
     .update({ role })
