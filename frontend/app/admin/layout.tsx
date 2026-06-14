@@ -164,7 +164,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             const hasChildren = !!item.children
 
             return (
-              <div key={item.href}>
+            <div key={item.href}>
                 {hasChildren ? (
                   <>
                     <button
@@ -184,7 +184,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                         }`}
                       />
                     </button>
-                    {expandedMenus.has(item.label) && (
+                    {expandedMenus.has(item.label) && item.children && (
                       <div className="ml-8 mt-1 space-y-1">
                         {item.children.map((child) => {
                           const childActive = pathname === child.href
