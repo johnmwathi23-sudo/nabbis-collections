@@ -68,7 +68,8 @@ export default function EditProductPage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) throw new Error("Not authenticated")
 
-      const { error } = await supabase
+      const supabaseAny = supabase as any
+      const { error } = await supabaseAny
         .from("products")
         .update({
           name: form.name,
@@ -85,7 +86,7 @@ export default function EditProductPage() {
           is_active: form.is_active,
           images: form.images,
           attributes: form.attributes,
-        } as any)
+        })
         .eq("id", id)
         .select()
         .single()

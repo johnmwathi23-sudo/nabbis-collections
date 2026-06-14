@@ -66,12 +66,12 @@ export default function NewProductPage() {
 
     setSaving(true)
     try {
-      const supabase = getAdminClient()
-      const { data: { user } } = await supabase.auth.getUser()
+      const supabaseAny = getAdminClient() as any
+      const { data: { user } } = await supabaseAny.auth.getUser()
 
       if (!user) throw new Error("Not authenticated")
 
-      const { data: product, error } = await supabase
+      const { data: product, error } = await supabaseAny
         .from("products")
         .insert({
           name: form.name,
