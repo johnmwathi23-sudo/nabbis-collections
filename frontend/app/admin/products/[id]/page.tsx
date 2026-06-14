@@ -85,7 +85,7 @@ export default function EditProductPage() {
           is_active: form.is_active,
           images: form.images,
           attributes: form.attributes,
-        })
+        } as any)
         .eq("id", id)
         .select()
         .single()
