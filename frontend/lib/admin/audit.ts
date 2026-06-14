@@ -1,5 +1,7 @@
 import { getAdminClient } from '@/lib/supabase/admin-client';
 
+const db = () => getAdminClient() as any;
+
 export async function logAudit(params: {
   adminId: string;
   action: 'create' | 'update' | 'delete';
@@ -8,7 +10,7 @@ export async function logAudit(params: {
   changes: any;
 }) {
   try {
-    const supabase = getAdminClient();
+    const supabase = db();
     await supabase.from('admin_audit_log').insert({
       admin_id: params.adminId,
       action: params.action,
@@ -22,7 +24,7 @@ export async function logAudit(params: {
 }
 
 export async function getAuditLog(limit = 50) {
-  const supabase = getAdminClient();
+  const supabase = db();
   const { data } = await supabase
     .from('admin_audit_log')
     .select('*, profiles:admin_id(email, first_name, last_name)')
