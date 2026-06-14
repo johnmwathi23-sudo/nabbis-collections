@@ -16,24 +16,24 @@ export async function getDashboardStats() {
     supabase.from('orders').select('total').eq('payment_status', 'paid'),
   ]);
 
-  const orders = ordersResult.data || [];
+  const orders = (ordersResult.data || []) as any[];
   const totalOrders = orders.length;
-  const pendingOrders = orders.filter((o) => o.status === 'pending').length;
-  const processingOrders = orders.filter((o) => o.status === 'processing').length;
-  const completedOrders = orders.filter((o) => o.status === 'completed').length;
-  const cancelledOrders = orders.filter((o) => o.status === 'cancelled').length;
+  const pendingOrders = orders.filter((o: any) => o.status === 'pending').length;
+  const processingOrders = orders.filter((o: any) => o.status === 'processing').length;
+  const completedOrders = orders.filter((o: any) => o.status === 'completed').length;
+  const cancelledOrders = orders.filter((o: any) => o.status === 'cancelled').length;
 
-  const totalRevenue = (revenueResult.data || []).reduce((sum, o) => sum + Number(o.total), 0);
+  const totalRevenue = (revenueResult.data || []).reduce((sum: number, o: any) => sum + Number(o.total), 0);
   const totalProducts = productsResult.count || 0;
-  const activeProducts = (productsResult.data || []).filter((p) => p.is_active).length;
+  const activeProducts = (productsResult.data || []).filter((p: any) => p.is_active).length;
   const totalCustomers = customersResult.count || 0;
 
   const last7Days = new Date();
   last7Days.setDate(last7Days.getDate() - 7);
-  const recentOrders = orders.filter((o) => new Date(o.created_at) >= last7Days);
+  const recentOrders = orders.filter((o: any) => new Date(o.created_at) >= last7Days);
   const recentRevenue = recentOrders
-    .filter((o) => o.status !== 'cancelled')
-    .reduce((sum, o) => sum + Number(o.total), 0);
+    .filter((o: any) => o.status !== 'cancelled')
+    .reduce((sum: number, o: any) => sum + Number(o.total), 0);
 
   return {
     totalOrders,
@@ -76,13 +76,13 @@ export async function getRevenueChartData(days = 30) {
   if (!data) return [];
 
   const dailyMap = new Map<string, number>();
-  data.forEach((o) => {
+  data.forEach((o: any) => {
     if (o.status === 'cancelled') return;
     const day = new Date(o.created_at).toISOString().slice(0, 10);
     dailyMap.set(day, (dailyMap.get(day) || 0) + Number(o.total));
   });
 
-  return Array.from(dailyMap.entries()).map(([date, revenue]) => ({
+  return Array.from(dailyMap.entries()).map(([date, revenue]: [string, number]) => ({
     date,
     revenue,
   }));
