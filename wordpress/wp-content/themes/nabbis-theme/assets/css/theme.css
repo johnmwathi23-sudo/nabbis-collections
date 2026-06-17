@@ -1,0 +1,876 @@
+/* Nabbis Collections - Theme Styles */
+/* Purple & Lavender Luxury Design System */
+
+:root {
+  --nabbis-purple-deep: #3B0764;
+  --nabbis-purple-primary: #5B21B6;
+  --nabbis-purple-medium: #7C3AED;
+  --nabbis-purple-light: #A78BFA;
+  --nabbis-lavender: #C4B5FD;
+  --nabbis-lavender-light: #DDD6FE;
+  --nabbis-lavender-bg: #F3E8FF;
+  --nabbis-gold: #D97706;
+  --nabbis-gold-light: #FCD34D;
+  --nabbis-white: #FFFFFF;
+  --nabbis-gray-50: #F9FAFB;
+  --nabbis-gray-100: #F3F4F6;
+  --nabbis-gray-200: #E5E7EB;
+  --nabbis-gray-400: #9CA3AF;
+  --nabbis-gray-600: #4B5563;
+  --nabbis-gray-700: #374151;
+  --nabbis-gray-900: #111827;
+  --nabbis-success: #059669;
+  --nabbis-error: #DC2626;
+  --nabbis-warning: #F59E0B;
+
+  --font-inter: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-playfair: 'Playfair Display', Georgia, serif;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-inter);
+  color: var(--nabbis-gray-900);
+  background: var(--nabbis-white);
+  line-height: 1.625;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.nabbis-container {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 clamp(1rem, 3vw, 2rem);
+}
+
+.nabbis-section {
+  padding: clamp(3rem, 5vw, 6rem) 0;
+}
+
+.nabbis-section-title {
+  font-family: var(--font-playfair);
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 700;
+  color: var(--nabbis-gray-900);
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+.nabbis-section-subtitle {
+  font-size: 1.125rem;
+  color: var(--nabbis-gray-600);
+  text-align: center;
+  margin-bottom: 3rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.nabbis-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-family: var(--font-inter);
+  font-weight: 600;
+  font-size: 1rem;
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.nabbis-btn-primary {
+  background: var(--nabbis-purple-primary);
+  color: var(--nabbis-white);
+}
+
+.nabbis-btn-primary:hover {
+  background: var(--nabbis-purple-deep);
+  color: var(--nabbis-white);
+}
+
+.nabbis-btn-gold {
+  background: var(--nabbis-gold);
+  color: var(--nabbis-white);
+}
+
+.nabbis-btn-gold:hover {
+  background: #B45309;
+  color: var(--nabbis-white);
+}
+
+.nabbis-btn-outline {
+  background: transparent;
+  color: var(--nabbis-purple-primary);
+  border: 2px solid var(--nabbis-purple-primary);
+}
+
+.nabbis-btn-outline:hover {
+  background: var(--nabbis-purple-primary);
+  color: var(--nabbis-white);
+}
+
+.nabbis-btn-white {
+  background: var(--nabbis-white);
+  color: var(--nabbis-purple-primary);
+}
+
+.nabbis-btn-white:hover {
+  background: var(--nabbis-lavender-bg);
+  color: var(--nabbis-purple-deep);
+}
+
+.nabbis-btn-lg {
+  padding: 1rem 2rem;
+  font-size: 1.125rem;
+}
+
+.nabbis-btn-sm {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+}
+
+.nabbis-btn-block {
+  width: 100%;
+}
+
+/* Delivery Notice Bar */
+.nabbis-delivery-bar {
+  background: var(--nabbis-purple-deep);
+  color: var(--nabbis-white);
+  text-align: center;
+  padding: 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+/* Header */
+.nabbis-header {
+  background: var(--nabbis-white);
+  border-bottom: 1px solid var(--nabbis-gray-200);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.nabbis-header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+}
+
+.nabbis-header-left {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.nabbis-header-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.nabbis-header-icon {
+  position: relative;
+  color: var(--nabbis-gray-700);
+  text-decoration: none;
+  padding: 0.5rem;
+  transition: color 0.2s;
+}
+
+.nabbis-header-icon:hover {
+  color: var(--nabbis-purple-primary);
+}
+
+.nabbis-cart-count {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: var(--nabbis-purple-primary);
+  color: var(--nabbis-white);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+/* Hero Section */
+.nabbis-hero {
+  position: relative;
+  min-height: 85vh;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  background: var(--nabbis-purple-deep);
+}
+
+.nabbis-hero-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.nabbis-hero-bg img,
+.nabbis-hero-bg video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.nabbis-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(59, 7, 100, 0.85) 0%, rgba(91, 33, 182, 0.7) 50%, rgba(124, 58, 237, 0.5) 100%);
+  z-index: 1;
+}
+
+.nabbis-hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 680px;
+  padding: clamp(4rem, 8vw, 8rem) 0;
+}
+
+.nabbis-hero-content h1 {
+  font-family: var(--font-playfair);
+  font-size: clamp(2.25rem, 6vw, 4.5rem);
+  font-weight: 800;
+  color: var(--nabbis-white);
+  line-height: 1.1;
+  margin-bottom: 1.5rem;
+  letter-spacing: -0.02em;
+}
+
+.nabbis-hero-content p {
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.75;
+  margin-bottom: 2rem;
+  max-width: 560px;
+}
+
+.nabbis-hero-actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* Featured Collections */
+.nabbis-featured-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.nabbis-featured-card {
+  position: relative;
+  border-radius: 1rem;
+  overflow: hidden;
+  aspect-ratio: 4/3;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.nabbis-featured-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(91, 33, 182, 0.15);
+}
+
+.nabbis-featured-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.nabbis-featured-card:hover img {
+  transform: scale(1.05);
+}
+
+.nabbis-featured-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(0deg, rgba(59, 7, 100, 0.8) 0%, transparent 60%);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 2rem;
+}
+
+.nabbis-featured-overlay h3 {
+  font-family: var(--font-playfair);
+  font-size: 1.5rem;
+  color: var(--nabbis-white);
+  margin: 0 0 0.5rem;
+}
+
+.nabbis-featured-overlay p {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9375rem;
+  margin: 0 0 1rem;
+}
+
+/* Product Grid */
+.nabbis-products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.nabbis-product-item {
+  background: var(--nabbis-white);
+  border: 1px solid var(--nabbis-gray-200);
+  border-radius: 0.75rem;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.nabbis-product-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(91, 33, 182, 0.1);
+}
+
+.nabbis-product-thumbnail {
+  position: relative;
+  aspect-ratio: 1;
+  overflow: hidden;
+  background: var(--nabbis-gray-50);
+}
+
+.nabbis-product-thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.nabbis-product-item:hover .nabbis-product-thumbnail img {
+  transform: scale(1.05);
+}
+
+.nabbis-product-item .price {
+  color: var(--nabbis-purple-primary);
+  font-weight: 700;
+  font-size: 1.125rem;
+}
+
+.nabbis-product-item del {
+  color: var(--nabbis-gray-400);
+  font-weight: 400;
+  font-size: 0.875rem;
+}
+
+.nabbis-product-item ins {
+  text-decoration: none;
+}
+
+/* Trust Badges */
+.nabbis-trust-badges {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 2rem;
+  text-align: center;
+  padding: 2rem 0;
+}
+
+.nabbis-trust-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.nabbis-trust-badge-icon {
+  font-size: 2rem;
+  width: 4rem;
+  height: 4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--nabbis-lavender-bg);
+  border-radius: 50%;
+  color: var(--nabbis-purple-primary);
+}
+
+.nabbis-trust-badge h4 {
+  font-family: var(--font-inter);
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.nabbis-trust-badge p {
+  font-size: 0.875rem;
+  color: var(--nabbis-gray-600);
+  margin: 0;
+}
+
+/* Testimonials */
+.nabbis-testimonials-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2rem;
+}
+
+.nabbis-testimonial-card {
+  background: var(--nabbis-white);
+  border: 1px solid var(--nabbis-gray-200);
+  border-radius: 1rem;
+  padding: 2rem;
+  position: relative;
+}
+
+.nabbis-testimonial-card::before {
+  content: '"';
+  font-family: var(--font-playfair);
+  font-size: 4rem;
+  color: var(--nabbis-lavender);
+  line-height: 1;
+  position: absolute;
+  top: 1rem;
+  left: 1.5rem;
+  opacity: 0.5;
+}
+
+.nabbis-testimonial-text {
+  font-size: 1rem;
+  color: var(--nabbis-gray-700);
+  line-height: 1.75;
+  margin-bottom: 1.5rem;
+  font-style: italic;
+}
+
+.nabbis-testimonial-author {
+  font-weight: 600;
+  color: var(--nabbis-gray-900);
+}
+
+.nabbis-testimonial-location {
+  font-size: 0.8125rem;
+  color: var(--nabbis-gray-400);
+}
+
+.nabbis-stars {
+  color: var(--nabbis-gold);
+  letter-spacing: 2px;
+  margin-bottom: 0.75rem;
+}
+
+/* Newsletter */
+.nabbis-newsletter {
+  background: linear-gradient(135deg, var(--nabbis-purple-deep) 0%, var(--nabbis-purple-primary) 100%);
+  padding: clamp(4rem, 6vw, 6rem) 0;
+  text-align: center;
+  color: var(--nabbis-white);
+}
+
+.nabbis-newsletter h2 {
+  font-family: var(--font-playfair);
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  margin-bottom: 1rem;
+}
+
+.nabbis-newsletter p {
+  font-size: 1.125rem;
+  opacity: 0.9;
+  margin-bottom: 2rem;
+}
+
+.nabbis-newsletter-form {
+  display: flex;
+  max-width: 480px;
+  margin: 0 auto;
+  gap: 0.5rem;
+}
+
+.nabbis-newsletter-form input[type="email"] {
+  flex: 1;
+  padding: 0.875rem 1.25rem;
+  border-radius: 0.5rem;
+  border: none;
+  font-size: 1rem;
+  font-family: var(--font-inter);
+}
+
+.nabbis-newsletter-form input[type="email"]:focus {
+  outline: 2px solid var(--nabbis-gold);
+}
+
+/* WhatsApp Floating Button */
+.nabbis-whatsapp-float {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 99;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #25D366;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  text-decoration: none;
+}
+
+.nabbis-whatsapp-float:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(37, 211, 102, 0.5);
+}
+
+.nabbis-whatsapp-float svg {
+  width: 28px;
+  height: 28px;
+}
+
+/* Footer */
+.nabbis-footer {
+  background: var(--nabbis-gray-900);
+  color: var(--nabbis-gray-400);
+  padding: clamp(3rem, 5vw, 5rem) 0 0;
+}
+
+.nabbis-footer-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 3rem;
+  margin-bottom: 3rem;
+}
+
+.nabbis-footer h4 {
+  color: var(--nabbis-white);
+  font-family: var(--font-inter);
+  font-size: 1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 1.25rem;
+}
+
+.nabbis-footer ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.nabbis-footer ul li {
+  margin-bottom: 0.75rem;
+}
+
+.nabbis-footer ul li a {
+  color: var(--nabbis-gray-400);
+  text-decoration: none;
+  font-size: 0.9375rem;
+  transition: color 0.2s;
+}
+
+.nabbis-footer ul li a:hover {
+  color: var(--nabbis-lavender);
+}
+
+.nabbis-footer-bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1.5rem 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-size: 0.875rem;
+}
+
+.nabbis-footer-payment-icons {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.nabbis-footer-payment-icons img {
+  height: 24px;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.nabbis-footer-payment-icons img:hover {
+  opacity: 1;
+}
+
+/* Breadcrumbs */
+.nabbis-breadcrumbs {
+  padding: 1rem 0;
+  font-size: 0.875rem;
+  color: var(--nabbis-gray-600);
+}
+
+.nabbis-breadcrumbs a {
+  color: var(--nabbis-purple-primary);
+  text-decoration: none;
+}
+
+.nabbis-breadcrumbs a:hover {
+  text-decoration: underline;
+}
+
+.nabbis-breadcrumbs .separator {
+  margin: 0 0.5rem;
+  color: var(--nabbis-gray-400);
+}
+
+.nabbis-breadcrumbs .current {
+  color: var(--nabbis-gray-900);
+  font-weight: 500;
+}
+
+/* Category Grid */
+.nabbis-category-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.nabbis-category-card {
+  position: relative;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  aspect-ratio: 4/3;
+  text-decoration: none;
+  display: block;
+}
+
+.nabbis-category-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.nabbis-category-card:hover img {
+  transform: scale(1.05);
+}
+
+.nabbis-category-card-content {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.6) 0%, transparent 50%);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 1.5rem;
+}
+
+.nabbis-category-card-content h3 {
+  font-family: var(--font-playfair);
+  font-size: 1.375rem;
+  color: var(--nabbis-white);
+  margin: 0 0 0.25rem;
+}
+
+.nabbis-category-card-content span {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* Mobile Menu Toggle */
+.nabbis-mobile-toggle {
+  display: none;
+  background: none;
+  border: none;
+  padding: 0.5rem;
+  cursor: pointer;
+  color: var(--nabbis-gray-700);
+}
+
+@media (max-width: 768px) {
+  .nabbis-mobile-toggle {
+    display: block;
+  }
+
+  .nabbis-header-nav {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--nabbis-white);
+    border-bottom: 1px solid var(--nabbis-gray-200);
+    padding: 1rem;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .nabbis-header-nav.open {
+    display: flex;
+  }
+
+  .nabbis-products-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .nabbis-featured-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .nabbis-hero {
+    min-height: 60vh;
+  }
+
+  .nabbis-hero-content h1 {
+    font-size: 2rem;
+  }
+
+  .nabbis-newsletter-form {
+    flex-direction: column;
+  }
+
+  .nabbis-footer-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .nabbis-footer-bottom {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .nabbis-testimonials-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .nabbis-products-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+
+  .nabbis-hero-content h1 {
+    font-size: 1.75rem;
+  }
+
+  .nabbis-footer-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Utility Classes */
+.nabbis-text-center { text-align: center; }
+.nabbis-flex { display: flex; }
+.nabbis-flex-center { align-items: center; justify-content: center; }
+.nabbis-gap-1 { gap: 0.5rem; }
+.nabbis-gap-2 { gap: 1rem; }
+.nabbis-gap-4 { gap: 2rem; }
+.nabbis-mt-2 { margin-top: 1rem; }
+.nabbis-mt-4 { margin-top: 2rem; }
+.nabbis-mb-2 { margin-bottom: 1rem; }
+.nabbis-mb-4 { margin-bottom: 2rem; }
+.nabbis-hidden { display: none; }
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.nabbis-animate-fade-up {
+  animation: fadeInUp 0.6s ease forwards;
+}
+
+/* Pagination */
+.woocommerce-pagination ul.page-numbers {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  list-style: none;
+  padding: 2rem 0;
+  margin: 0;
+}
+
+.woocommerce-pagination ul.page-numbers li a,
+.woocommerce-pagination ul.page-numbers li span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 0.5rem;
+  border: 1px solid var(--nabbis-gray-200);
+  color: var(--nabbis-gray-700);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.9375rem;
+  transition: all 0.2s;
+}
+
+.woocommerce-pagination ul.page-numbers li span.current {
+  background: var(--nabbis-purple-primary);
+  color: var(--nabbis-white);
+  border-color: var(--nabbis-purple-primary);
+}
+
+.woocommerce-pagination ul.page-numbers li a:hover {
+  background: var(--nabbis-lavender-bg);
+  border-color: var(--nabbis-purple-primary);
+}
+
+/* Search */
+.nabbis-search-form {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.nabbis-search-form input[type="search"] {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--nabbis-gray-200);
+  border-radius: 0.5rem;
+  font-family: var(--font-inter);
+  font-size: 0.9375rem;
+}
+
+.nabbis-search-form input[type="search"]:focus {
+  outline: none;
+  border-color: var(--nabbis-purple-primary);
+  box-shadow: 0 0 0 3px rgba(91, 33, 182, 0.1);
+}
+
+/* Page Header */
+.nabbis-page-header {
+  background: linear-gradient(135deg, var(--nabbis-lavender-bg) 0%, var(--nabbis-white) 100%);
+  padding: clamp(3rem, 5vw, 5rem) 0;
+  text-align: center;
+}
+
+.nabbis-page-header h1 {
+  font-family: var(--font-playfair);
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  color: var(--nabbis-gray-900);
+  margin: 0;
+}
