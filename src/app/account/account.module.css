@@ -1,0 +1,201 @@
+.container {
+  padding-top: var(--spacing-10);
+  padding-bottom: var(--spacing-12);
+}
+
+.profileLayout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: var(--spacing-8);
+  margin-top: var(--spacing-6);
+}
+
+/* Sidebar Info Card */
+.profileCard {
+  background: var(--color-white);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-6);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-gray-200);
+  height: fit-content;
+  text-align: center;
+}
+
+.avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-purple) 0%, var(--color-purple-light) 100%);
+  color: var(--color-white);
+  font-size: 2rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto var(--spacing-4) auto;
+  box-shadow: var(--shadow-sm);
+}
+
+.name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-black);
+  margin-bottom: var(--spacing-1);
+}
+
+.roleBadge {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background-color: var(--color-lavender);
+  color: var(--color-purple);
+  padding: 4px 10px;
+  border-radius: 50px;
+  text-transform: uppercase;
+  margin-bottom: var(--spacing-4);
+}
+
+.profileMeta {
+  text-align: left;
+  font-size: 0.85rem;
+  color: var(--color-gray-600);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+  margin-bottom: var(--spacing-6);
+  padding-top: var(--spacing-4);
+  border-top: 1px solid var(--color-gray-200);
+}
+
+.logoutBtn {
+  width: 100%;
+}
+
+/* Orders Dashboard */
+.ordersPanel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-6);
+}
+
+.panelTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-black);
+  margin-bottom: var(--spacing-4);
+}
+
+.orderCard {
+  background: var(--color-white);
+  border-radius: var(--border-radius-lg);
+  border: 1px solid var(--color-gray-200);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.orderHeader {
+  background-color: var(--color-gray-50);
+  padding: var(--spacing-4) var(--spacing-5);
+  border-bottom: 1px solid var(--color-gray-200);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--spacing-3);
+  font-size: 0.9rem;
+  color: var(--color-gray-600);
+}
+
+.orderId {
+  font-weight: 700;
+  color: var(--color-black);
+}
+
+.statusBadge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 50px;
+  text-transform: uppercase;
+}
+
+.statusPending {
+  background-color: rgba(237, 108, 2, 0.1);
+  color: var(--color-warning);
+}
+
+.statusConfirmed {
+  background-color: rgba(49, 130, 206, 0.1);
+  color: #3182ce;
+}
+
+.statusShipped {
+  background-color: rgba(106, 13, 173, 0.1);
+  color: var(--color-purple);
+}
+
+.statusDelivered {
+  background-color: rgba(46, 125, 50, 0.1);
+  color: var(--color-success);
+}
+
+.statusCancelled {
+  background-color: rgba(211, 47, 47, 0.1);
+  color: var(--color-error);
+}
+
+.orderBody {
+  padding: var(--spacing-5);
+}
+
+.itemRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-3);
+  font-size: 0.95rem;
+}
+
+.itemRow:last-child {
+  margin-bottom: 0;
+}
+
+.itemName {
+  font-weight: 600;
+  color: var(--color-gray-800);
+}
+
+.itemQty {
+  color: var(--color-gray-600);
+  font-size: 0.85rem;
+}
+
+.orderFooter {
+  padding: var(--spacing-4) var(--spacing-5);
+  background-color: var(--color-gray-50);
+  border-top: 1px solid var(--color-gray-200);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.orderTotal {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--color-purple);
+}
+
+.noOrders {
+  text-align: center;
+  padding: var(--spacing-12);
+  background: var(--color-white);
+  border-radius: var(--border-radius-lg);
+  border: 1px solid var(--color-gray-200);
+  color: var(--color-gray-600);
+}
+
+@media (max-width: 768px) {
+  .profileLayout {
+    grid-template-columns: 1fr;
+  }
+}

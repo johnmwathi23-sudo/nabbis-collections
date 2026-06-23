@@ -1,0 +1,236 @@
+.container {
+  padding-top: var(--spacing-10);
+  padding-bottom: var(--spacing-12);
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: var(--spacing-8);
+  color: var(--color-black);
+}
+
+.cartLayout {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: var(--spacing-8);
+  align-items: flex-start;
+}
+
+/* Cart Items List */
+.itemList {
+  background: var(--color-white);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-6);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-gray-200);
+}
+
+.cartItem {
+  display: grid;
+  grid-template-columns: 80px 1fr auto auto;
+  gap: var(--spacing-4);
+  align-items: center;
+  padding: var(--spacing-4) 0;
+  border-bottom: 1px solid var(--color-gray-200);
+}
+
+.cartItem:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.cartItem:first-child {
+  padding-top: 0;
+}
+
+.itemImage {
+  width: 80px;
+  height: 80px;
+  border-radius: var(--border-radius-md);
+  object-fit: cover;
+  background-color: var(--color-gray-100);
+  border: 1px solid var(--color-gray-200);
+}
+
+.itemInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.itemName {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-black);
+  margin-bottom: 4px;
+}
+
+.itemName:hover {
+  color: var(--color-purple);
+}
+
+.itemVendor {
+  font-size: 0.75rem;
+  color: var(--color-gray-600);
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.itemPrice {
+  font-weight: 700;
+  color: var(--color-purple);
+  margin-top: 4px;
+}
+
+.qtyControls {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--color-gray-400);
+  border-radius: var(--border-radius-md);
+  overflow: hidden;
+  height: 36px;
+  margin: 0 var(--spacing-4);
+}
+
+.qtyBtn {
+  width: 32px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  background-color: var(--color-gray-50);
+}
+
+.qtyBtn:hover {
+  background-color: var(--color-gray-200);
+}
+
+.qtyInput {
+  width: 36px;
+  height: 100%;
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 700;
+  border: none;
+  outline: none;
+}
+
+.removeBtn {
+  color: var(--color-gray-600);
+  transition: color var(--transition-fast);
+  padding: var(--spacing-2);
+}
+
+.removeBtn:hover {
+  color: var(--color-error);
+}
+
+/* Summary Panel */
+.summaryPanel {
+  background: var(--color-white);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-6);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-gray-200);
+}
+
+.summaryTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: var(--spacing-6);
+  color: var(--color-black);
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.95rem;
+  color: var(--color-gray-800);
+  margin-bottom: var(--spacing-4);
+}
+
+.summaryTotalRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--color-black);
+  margin-top: var(--spacing-6);
+  padding-top: var(--spacing-6);
+  border-top: 2px dashed var(--color-gray-200);
+}
+
+.promoBlock {
+  margin: var(--spacing-6) 0;
+}
+
+.promoInputGroup {
+  display: flex;
+  gap: var(--spacing-2);
+}
+
+.promoInput {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid var(--color-gray-400);
+  border-radius: var(--border-radius-md);
+  font-size: 0.85rem;
+  outline: none;
+}
+
+.promoInput:focus {
+  border-color: var(--color-purple);
+}
+
+.checkoutBtn {
+  width: 100%;
+  height: 48px;
+  font-size: 1rem;
+}
+
+.emptyCart {
+  text-align: center;
+  padding: var(--spacing-12) var(--spacing-6);
+  background: var(--color-white);
+  border-radius: var(--border-radius-lg);
+  border: 1px solid var(--color-gray-200);
+}
+
+.emptyTitle {
+  font-size: 1.5rem;
+  margin-bottom: var(--spacing-2);
+}
+
+@media (max-width: 992px) {
+  .cartLayout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 576px) {
+  .cartItem {
+    grid-template-columns: 60px 1fr;
+    gap: var(--spacing-3);
+    position: relative;
+    padding-bottom: var(--spacing-6);
+  }
+
+  .itemImage {
+    width: 60px;
+    height: 60px;
+  }
+
+  .qtyControls {
+    position: absolute;
+    bottom: var(--spacing-2);
+    left: 80px;
+    margin: 0;
+  }
+
+  .removeBtn {
+    position: absolute;
+    top: var(--spacing-2);
+    right: 0;
+  }
+}
