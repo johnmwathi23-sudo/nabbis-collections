@@ -1,0 +1,102 @@
+version: '3.8'
+
+services:
+  wordpress:
+    build:
+      context: .
+      dockerfile: Dockerfile.wordpress
+    container_name: nabbis-wordpress
+    ports:
+      - "8080:80"
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: nabbis
+      WORDPRESS_DB_PASSWORD: nabbis_secure_pass_2026
+      WORDPRESS_DB_NAME: nabbis_collections
+      WORDPRESS_DEBUG: 1
+      WORDPRESS_CONFIG_EXTRA: |
+        define('WP_REDIS_HOST', 'redis');
+        define('WP_REDIS_PORT', 6379);
+        define('WP_REDIS_DATABASE', 0);
+        define('WP_CACHE_KEY_SALT', 'nabbis:');
+        define('FS_METHOD', 'direct');
+    volumes:
+      - ../wordpress:/var/www/html
+      - ./php.ini:/usr/local/etc/php/conf.d/custom.ini
+    depends_on:
+      - db
+      - redis
+    networks:
+      - nabbis-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  db:
+    image: mysql:8.0
+    container_name: nabbis-db
+    environment:
+      MYSQL_DATABASE: nabbis_collections
+      MYSQL_USER: nabbis
+      MYSQL_PASSWORD: nabbis_secure_pass_2026
+      MYSQL_ROOT_PASSWORD: root_secure_pass_2026
+      MYSQL_CHARSET: utf8mb4
+      MYSQL_COLLATION: utf8mb4_unicode_ci
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - nabbis-network
+    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: nabbis-redis
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
+    networks:
+      - nabbis-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: nabbis-phpmyadmin
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: db
+      PMA_USER: nabbis
+      PMA_PASSWORD: nabbis_secure_pass_2026
+      UPLOAD_LIMIT: 256M
+    depends_on:
+      - db
+    networks:
+      - nabbis-network
+
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: nabbis-mailpit
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+    networks:
+      - nabbis-network
+
+volumes:
+  db_data:
+  redis_data:
+
+networks:
+  nabbis-network:
+    driver: bridge

@@ -1,0 +1,20 @@
+{
+  "name": "nabbis/collections",
+  "description": "Nabbis Collections - Premium E-commerce Platform on WordPress & WooCommerce",
+  "type": "project",
+  "require": {
+    "php": ">=8.0",
+    "composer/installers": "^2.2"
+  },
+  "config": {
+    "allow-plugins": {
+      "composer/installers": true
+    }
+  },
+  "scripts": {
+    "post-install-cmd": [
+      "wp theme activate nabbis-theme",
+      "wp rewrite flush"
+    ]
+  }
+}
