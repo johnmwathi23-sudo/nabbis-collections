@@ -1,4 +1,4 @@
-name: Deploy - Nabbis Collections
+name: Deploy - Nabbis Collections to Vercel
 
 on:
   push:
@@ -13,64 +13,28 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          php-version: '8.3'
-          tools: composer
+          node-version: '20'
+          cache: 'npm'
 
-      - name: Install rsync
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y rsync sshpass
+      - name: Install dependencies
+        run: npm ci
 
-      - name: Deploy via rsync
-        env:
-          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
-          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
-          DEPLOY_PASS: ${{ secrets.DEPLOY_PASS }}
-          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
-        run: |
-          sshpass -p "$DEPLOY_PASS" rsync -avz --delete \
-            --exclude '.git' \
-            --exclude '.github' \
-            --exclude 'docker' \
-            --exclude 'node_modules' \
-            --exclude '.gitignore' \
-            --exclude 'README.md' \
-            wordpress/wp-content/themes/nabbis-theme/ \
-            "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH/wp-content/themes/nabbis-theme/"
+      - name: Run lint
+        run: npm run lint
 
-          sshpass -p "$DEPLOY_PASS" rsync -avz --delete \
-            --exclude '.git' \
-            wordpress/wp-content/plugins/nabbis-mpesa/ \
-            "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH/wp-content/plugins/nabbis-mpesa/"
+      - name: Run typecheck
+        run: npm run typecheck
 
-          sshpass -p "$DEPLOY_PASS" rsync -avz --delete \
-            wordpress/wp-content/plugins/nabbis-delivery/ \
-            "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH/wp-content/plugins/nabbis-delivery/"
+      - name: Build
+        run: npm run build
 
-          sshpass -p "$DEPLOY_PASS" rsync -avz --delete \
-            wordpress/wp-content/plugins/nabbis-core/ \
-            "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH/wp-content/plugins/nabbis-core/"
-
-          sshpass -p "$DEPLOY_PASS" rsync -avz --delete \
-            wordpress/wp-content/plugins/nabbis-admin/ \
-            "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH/wp-content/plugins/nabbis-admin/"
-
-          sshpass -p "$DEPLOY_PASS" rsync -avz --delete \
-            wordpress/wp-content/mu-plugins/ \
-            "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH/wp-content/mu-plugins/"
-
-      - name: Run post-deploy commands
-        env:
-          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
-          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
-          DEPLOY_PASS: ${{ secrets.DEPLOY_PASS }}
-        run: |
-          sshpass -p "$DEPLOY_PASS" ssh "$DEPLOY_USER@$DEPLOY_HOST" "
-            cd $DEPLOY_PATH
-            wp cache flush --allow-root
-            wp rewrite flush --allow-root
-            wp theme activate nabbis-theme --allow-root
-          "
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: '--prod'
