@@ -2,21 +2,76 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { useApp } from '../../context/AppContext';
 import { useCart } from '../../context/CartContext';
 import { Button } from '../../components/Button';
 import { DELIVERY_FEES, FREE_DELIVERY_THRESHOLD } from '../../lib/types';
 import styles from './checkout.module.css';
 
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '');
+
+function CardPaymentForm({ clientSecret, amount, onSuccess, onCancel }: {
+  clientSecret: string;
+  amount: number;
+  onSuccess: () => void;
+  onCancel: () => void;
+}) {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [error, setError] = useState<string | null>(null);
+  const [processing, setProcessing] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!stripe || !elements) return;
+
+    setProcessing(true);
+    setError(null);
+
+    const { error: err } = await stripe.confirmPayment({
+      elements,
+      confirmParams: { return_url: `${window.location.origin}/checkout?success=true` },
+      redirect: 'if_required',
+    });
+
+    if (err) {
+      setError(err.message || 'Payment failed');
+      setProcessing(false);
+    } else {
+      onSuccess();
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <div style={{ marginBottom: '1.5rem' }}>
+        <PaymentElement />
+      </div>
+      {error && (
+        <div style={{ color: '#dc2626', fontSize: '0.875rem', marginBottom: '1rem', padding: '0.75rem', background: '#fef2f2', borderRadius: '6px' }}>
+          {error}
+        </div>
+      )}
+      <div style={{ display: 'flex', gap: '1rem' }}>
+        <Button type="button" variant="outline" onClick={onCancel} disabled={processing} style={{ flex: 1 }}>
+          Back
+        </Button>
+        <Button type="submit" variant="primary" disabled={!stripe || processing} style={{ flex: 1 }}>
+          {processing ? 'Processing...' : `Pay KES ${amount.toLocaleString()}`}
+        </Button>
+      </div>
+    </form>
+  );
+}
+
 export default function CheckoutPage() {
   const router = useRouter();
   const { currentUser, placeOrder } = useApp();
   const { items, subtotal, totalItems, clearCart } = useCart();
 
-  // Checkout flow states
   const [step, setStep] = useState<1 | 2 | 3>(1);
-
-  // Form Fields
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
@@ -25,12 +80,12 @@ export default function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState<'mpesa' | 'airtel' | 'card'>('mpesa');
   const [mpesaPhone, setMpesaPhone] = useState('');
 
-  // Simulation states
+  const [clientSecret, setClientSecret] = useState<string>('');
+  const [loadingIntent, setLoadingIntent] = useState(false);
   const [showSTKModal, setShowSTKModal] = useState(false);
   const [stkTimer, setStkTimer] = useState(15);
   const [placedOrderDetails, setPlacedOrderDetails] = useState<any>(null);
 
-  // Set default values from currentUser
   useEffect(() => {
     if (currentUser) {
       setFullName(currentUser.name);
@@ -39,13 +94,10 @@ export default function CheckoutPage() {
     }
   }, [currentUser]);
 
-  // STK Timer Countdown
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (showSTKModal && stkTimer > 0) {
-      interval = setInterval(() => {
-        setStkTimer(prev => prev - 1);
-      }, 1000);
+      interval = setInterval(() => setStkTimer(prev => prev - 1), 1000);
     } else if (showSTKModal && stkTimer === 0) {
       setShowSTKModal(false);
       handleCompleteOrderPlacement();
@@ -53,7 +105,6 @@ export default function CheckoutPage() {
     return () => clearInterval(interval);
   }, [showSTKModal, stkTimer]);
 
-  // If cart is empty and order hasn't been placed yet
   if (items.length === 0 && step !== 3) {
     return (
       <div className="container" style={{ padding: '8rem 2rem', textAlign: 'center' }}>
@@ -61,26 +112,44 @@ export default function CheckoutPage() {
         <p style={{ color: 'var(--color-gray-600)', marginBottom: '2rem' }}>
           Please add products to your cart before proceeding to checkout.
         </p>
-        <Link href="/shop">
-          <Button variant="primary">Browse Products</Button>
-        </Link>
+        <Link href="/shop"><Button variant="primary">Browse Products</Button></Link>
       </div>
     );
   }
 
-  // Calculate delivery fee
   const deliveryFee = () => {
     if (deliveryType === 'pickup') return 0;
     if (deliveryType === 'nairobi' && subtotal >= FREE_DELIVERY_THRESHOLD) return 0;
     return DELIVERY_FEES[deliveryType];
   };
-
   const finalTotal = subtotal + deliveryFee();
 
   const handleNextStep = (e: React.FormEvent) => {
     e.preventDefault();
-    if (step === 1) {
-      setStep(2);
+    if (step === 1) setStep(2);
+  };
+
+  const handleSelectCard = async () => {
+    setPaymentMethod('card');
+    setLoadingIntent(true);
+    try {
+      const res = await fetch('/api/create-payment-intent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount: finalTotal,
+          email: currentUser?.email || '',
+          name: fullName,
+        }),
+      });
+      const data = await res.json();
+      if (data.clientSecret) {
+        setClientSecret(data.clientSecret);
+      }
+    } catch (err) {
+      console.error('Failed to create payment intent:', err);
+    } finally {
+      setLoadingIntent(false);
     }
   };
 
@@ -88,8 +157,9 @@ export default function CheckoutPage() {
     if (paymentMethod === 'mpesa') {
       setStkTimer(15);
       setShowSTKModal(true);
+    } else if (paymentMethod === 'card' && clientSecret) {
+      // Card payment handled by form
     } else {
-      // Direct placement for other methods (mock loading)
       handleCompleteOrderPlacement();
     }
   };
@@ -107,317 +177,173 @@ export default function CheckoutPage() {
 
   return (
     <div className={`container ${styles.container}`}>
-      {/* Step Nodes */}
       <div className={styles.stepsHeader}>
         <div className={`${styles.stepNode} ${step >= 1 ? styles.stepNodeActive : ''}`}>
-          <span className={styles.stepNum}>1</span>
-          <span>Delivery Details</span>
+          <span className={styles.stepNum}>1</span><span>Delivery Details</span>
         </div>
         <div className={`${styles.stepNode} ${step >= 2 ? styles.stepNodeActive : ''}`}>
-          <span className={styles.stepNum}>2</span>
-          <span>Payment Info</span>
+          <span className={styles.stepNum}>2</span><span>Payment Info</span>
         </div>
         <div className={`${styles.stepNode} ${step === 3 ? styles.stepNodeActive : ''}`}>
-          <span className={styles.stepNum}>3</span>
-          <span>Order Confirmation</span>
+          <span className={styles.stepNum}>3</span><span>Confirmation</span>
         </div>
       </div>
 
       {step === 3 && placedOrderDetails ? (
-        /* ===== STEP 3: SUCCESS RECEIPT ===== */
         <div className={styles.receiptBox}>
           <div className={styles.successIcon}>✓</div>
           <h1 className={styles.receiptTitle}>Order Placed Successfully!</h1>
           <p className={styles.receiptDesc}>
-            Your order has been logged. An STK payment verification was approved.
+            {paymentMethod === 'card' ? 'Your card payment was successful.' : 'Your order has been logged and payment verified.'}
           </p>
-
           <div className={styles.receiptSummary}>
-            <div className={styles.receiptRow}>
-              <span>Order Reference ID:</span>
-              <strong>{placedOrderDetails.id}</strong>
-            </div>
+            <div className={styles.receiptRow}><span>Order Reference:</span><strong>{placedOrderDetails.id}</strong></div>
             <div className={styles.receiptRow}>
               <span>Estimated Delivery:</span>
               <strong>
-                {deliveryType === 'nairobi' 
-                  ? 'Within 24 Hours (Express)' 
-                  : deliveryType === 'parcel' 
-                  ? '2 - 3 Days (Courier)' 
-                  : 'Ready in 2 Hours (Pickup)'
-                }
+                {deliveryType === 'nairobi' ? 'Within 24 Hours' :
+                 deliveryType === 'parcel' ? '2 - 3 Days' : 'Ready in 2 Hours'}
               </strong>
             </div>
-            <div className={styles.receiptRow}>
-              <span>Courier Partner:</span>
-              <strong>Nabbis Logistics Hub</strong>
-            </div>
-            <div className={styles.receiptRow}>
-              <span>Support Contact:</span>
-              <strong>+254 700 000 000</strong>
-            </div>
-
-            <div className={styles.receiptTotalRow}>
-              <span>Total Reconciled:</span>
-              <span>KES {placedOrderDetails.total.toLocaleString()}</span>
-            </div>
+            <div className={styles.receiptTotalRow}><span>Total:</span><span>KES {placedOrderDetails.total.toLocaleString()}</span></div>
           </div>
-
           <div style={{ display: 'flex', gap: '1rem' }}>
-            <Link href="/account" style={{ flex: 1 }}>
-              <Button variant="primary" style={{ width: '100%' }}>Track Order</Button>
-            </Link>
-            <Link href="/shop" style={{ flex: 1 }}>
-              <Button variant="outline" style={{ width: '100%' }}>Continue Shopping</Button>
-            </Link>
+            <Link href="/account" style={{ flex: 1 }}><Button variant="primary" style={{ width: '100%' }}>Track Order</Button></Link>
+            <Link href="/shop" style={{ flex: 1 }}><Button variant="outline" style={{ width: '100%' }}>Continue Shopping</Button></Link>
           </div>
         </div>
       ) : (
-        /* ===== STEPS 1 & 2: CHECKOUT LAYOUT ===== */
         <div className={styles.checkoutLayout}>
-          {/* Left Column: Forms */}
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             {!currentUser ? (
               <div className={styles.panelCard} style={{ textAlign: 'center' }}>
-                <h2 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: '1rem' }}>Checkout as Guest or Register</h2>
-                <p style={{ color: 'var(--color-gray-600)', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
-                  Please login or sign up for a Nabbis Collections account to log this order under your account history.
-                </p>
+                <h2 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: '1rem' }}>Please Log In</h2>
+                <p style={{ color: 'var(--color-gray-600)', marginBottom: '1.5rem' }}>Log in to complete your order.</p>
                 <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-                  <Link href="/login">
-                    <Button variant="primary" size="sm">Log In First</Button>
-                  </Link>
-                  <Link href="/register">
-                    <Button variant="outline" size="sm">Sign Up</Button>
-                  </Link>
+                  <Link href="/login"><Button variant="primary" size="sm">Log In</Button></Link>
+                  <Link href="/register"><Button variant="outline" size="sm">Sign Up</Button></Link>
                 </div>
               </div>
             ) : (
               <>
                 {step === 1 ? (
-                  /* Step 1 Form */
                   <form onSubmit={handleNextStep} className={styles.panelCard}>
                     <h2 className={styles.panelTitle}>Delivery Details</h2>
-                    
                     <div className={styles.formGrid}>
                       <div className={styles.inputGroup}>
-                        <label htmlFor="fullName" className={styles.label}>Recipient Name</label>
-                        <input
-                          id="fullName"
-                          type="text"
-                          required
-                          value={fullName}
-                          onChange={(e) => setFullName(e.target.value)}
-                          placeholder="e.g. Jane Doe"
-                          className={styles.input}
-                        />
+                        <label className={styles.label}>Recipient Name</label>
+                        <input type="text" required value={fullName} onChange={(e) => setFullName(e.target.value)} className={styles.input} />
                       </div>
-
                       <div className={styles.inputGroup}>
-                        <label htmlFor="phone" className={styles.label}>Recipient Phone Number</label>
-                        <input
-                          id="phone"
-                          type="tel"
-                          required
-                          value={phone}
-                          onChange={(e) => setPhone(e.target.value)}
-                          placeholder="e.g. +254 700 000 000"
-                          className={styles.input}
-                        />
+                        <label className={styles.label}>Phone Number</label>
+                        <input type="tel" required value={phone} onChange={(e) => setPhone(e.target.value)} className={styles.input} />
                       </div>
                     </div>
-
                     <div className={styles.inputGroup} style={{ marginBottom: '1.5rem' }}>
-                      <label htmlFor="address" className={styles.label}>Physical Address / Dropoff Point</label>
-                      <input
-                        id="address"
-                        type="text"
-                        required
-                        value={address}
-                        onChange={(e) => setAddress(e.target.value)}
-                        placeholder="Apartment name, house/office number, street..."
-                        className={styles.input}
-                      />
+                      <label className={styles.label}>Address</label>
+                      <input type="text" required value={address} onChange={(e) => setAddress(e.target.value)} className={styles.input} />
                     </div>
-
                     <div className={styles.inputGroup} style={{ marginBottom: '1.5rem' }}>
-                      <label htmlFor="city" className={styles.label}>City / County</label>
-                      <select
-                        id="city"
-                        value={city}
-                        onChange={(e) => {
-                          setCity(e.target.value);
-                          if (e.target.value === 'Nairobi') {
-                            setDeliveryType('nairobi');
-                          } else {
-                            setDeliveryType('parcel');
-                          }
-                        }}
-                        className={styles.input}
-                        style={{ cursor: 'pointer' }}
-                      >
-                        {['Nairobi', 'Mombasa', 'Kisumu', 'Nakuru', 'Eldoret', 'Thika', 'Kiambu', 'Machakos'].map(c => (
-                          <option key={c} value={c}>{c}</option>
-                        ))}
+                      <label className={styles.label}>City</label>
+                      <select value={city} onChange={(e) => { setCity(e.target.value); setDeliveryType(e.target.value === 'Nairobi' ? 'nairobi' : 'parcel'); }} className={styles.input}>
+                        {['Nairobi', 'Mombasa', 'Kisumu', 'Nakuru', 'Eldoret', 'Thika', 'Kiambu', 'Machakos'].map(c => <option key={c} value={c}>{c}</option>)}
                       </select>
                     </div>
-
-                    <h3 className={styles.label} style={{ marginBottom: '10px' }}>Select Delivery Method</h3>
+                    <h3 className={styles.label} style={{ marginBottom: '10px' }}>Delivery Method</h3>
                     <div className={styles.deliveryOptions}>
                       {city === 'Nairobi' && (
-                        <div
-                          onClick={() => setDeliveryType('nairobi')}
-                          className={`${styles.deliveryCard} ${deliveryType === 'nairobi' ? styles.deliveryCardActive : ''}`}
-                        >
+                        <div onClick={() => setDeliveryType('nairobi')} className={`${styles.deliveryCard} ${deliveryType === 'nairobi' ? styles.deliveryCardActive : ''}`}>
                           <span className={styles.deliveryLabel}>Nairobi Express</span>
-                          <span className={styles.deliveryPrice}>
-                            {subtotal >= FREE_DELIVERY_THRESHOLD ? 'FREE' : 'KES 250'}
-                          </span>
-                          <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--color-gray-600)', marginTop: '4px' }}>Within 24 Hours</span>
+                          <span className={styles.deliveryPrice}>{subtotal >= FREE_DELIVERY_THRESHOLD ? 'FREE' : 'KES 250'}</span>
                         </div>
                       )}
-                      
                       {city !== 'Nairobi' && (
-                        <div
-                          onClick={() => setDeliveryType('parcel')}
-                          className={`${styles.deliveryCard} ${deliveryType === 'parcel' ? styles.deliveryCardActive : ''}`}
-                        >
-                          <span className={styles.deliveryLabel}>County Parcel Courier</span>
+                        <div onClick={() => setDeliveryType('parcel')} className={`${styles.deliveryCard} ${deliveryType === 'parcel' ? styles.deliveryCardActive : ''}`}>
+                          <span className={styles.deliveryLabel}>Courier</span>
                           <span className={styles.deliveryPrice}>KES 400</span>
-                          <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--color-gray-600)', marginTop: '4px' }}>2 - 3 Working Days</span>
                         </div>
                       )}
-
-                      <div
-                        onClick={() => setDeliveryType('pickup')}
-                        className={`${styles.deliveryCard} ${deliveryType === 'pickup' ? styles.deliveryCardActive : ''}`}
-                      >
-                        <span className={styles.deliveryLabel}>Office Collection</span>
+                      <div onClick={() => setDeliveryType('pickup')} className={`${styles.deliveryCard} ${deliveryType === 'pickup' ? styles.deliveryCardActive : ''}`}>
+                        <span className={styles.deliveryLabel}>Pickup</span>
                         <span className={styles.deliveryPrice}>FREE</span>
-                        <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--color-gray-600)', marginTop: '4px' }}>Nairobi CBD Hub</span>
                       </div>
                     </div>
-
-                    <Button type="submit" variant="primary" style={{ width: '100%', marginTop: '2rem' }}>
-                      Proceed to Payment
-                    </Button>
+                    <Button type="submit" variant="primary" style={{ width: '100%', marginTop: '2rem' }}>Proceed to Payment</Button>
                   </form>
-                ) : (
-                  /* Step 2 Form */
+                ) : step === 2 && paymentMethod === 'card' && clientSecret ? (
+                  <div className={styles.panelCard}>
+                    <h2 className={styles.panelTitle}>Card Payment</h2>
+                    <Elements stripe={stripePromise} options={{ clientSecret }}>
+                      <CardPaymentForm clientSecret={clientSecret} amount={finalTotal} onSuccess={handleCompleteOrderPlacement} onCancel={() => { setStep(1); setClientSecret(''); }} />
+                    </Elements>
+                  </div>
+                ) : step === 2 ? (
                   <div className={styles.panelCard}>
                     <h2 className={styles.panelTitle}>Payment Details</h2>
-
                     <div className={styles.paymentMethods}>
-                      <div
-                        onClick={() => setPaymentMethod('mpesa')}
-                        className={`${styles.paymentCard} ${paymentMethod === 'mpesa' ? styles.paymentCardActive : ''}`}
-                      >
+                      <div onClick={() => setPaymentMethod('mpesa')} className={`${styles.paymentCard} ${paymentMethod === 'mpesa' ? styles.paymentCardActive : ''}`}>
                         <div className={styles.paymentLogo} style={{ color: '#39b54a' }}>M-PESA</div>
                         <div className={styles.paymentInfo}>
-                          <span className={styles.paymentName}>Lipa Na M-Pesa STK Push</span>
-                          <span className={styles.paymentDesc}>Receive payment prompt directly on your mobile device instantly.</span>
+                          <span className={styles.paymentName}>Lipa Na M-Pesa</span>
+                          <span className={styles.paymentDesc}>STK Push to your phone</span>
                         </div>
                       </div>
-
-                      <div
-                        onClick={() => setPaymentMethod('airtel')}
-                        className={`${styles.paymentCard} ${paymentMethod === 'airtel' ? styles.paymentCardActive : ''}`}
-                      >
-                        <div className={styles.paymentLogo} style={{ color: '#ff0000' }}>Airtel</div>
-                        <div className={styles.paymentInfo}>
-                          <span className={styles.paymentName}>Airtel Money Payout</span>
-                          <span className={styles.paymentDesc}>Approve Airtel payment verification prompts securely.</span>
-                        </div>
-                      </div>
-
-                      <div
-                        onClick={() => setPaymentMethod('card')}
-                        className={`${styles.paymentCard} ${paymentMethod === 'card' ? styles.paymentCardActive : ''}`}
-                      >
-                        <div className={styles.paymentLogo} style={{ color: 'var(--color-purple)' }}>CARDS</div>
-                        <div className={styles.paymentInfo}>
-                          <span className={styles.paymentName}>Visa / Mastercard / Amex</span>
-                          <span className={styles.paymentDesc}>Secure checkout using debit or credit cards.</span>
-                        </div>
+                      <div onClick={handleSelectCard} className={`${styles.paymentCard} ${paymentMethod === 'card' ? styles.paymentCardActive : ''}`}>
+                        {loadingIntent ? (
+                          <div className={styles.paymentLogo} style={{ color: 'var(--color-purple)' }}>Loading...</div>
+                        ) : (
+                          <>
+                            <div className={styles.paymentLogo} style={{ color: 'var(--color-purple)' }}>CARDS</div>
+                            <div className={styles.paymentInfo}>
+                              <span className={styles.paymentName}>Visa / Mastercard</span>
+                              <span className={styles.paymentDesc}>Secure card payment</span>
+                            </div>
+                          </>
+                        )}
                       </div>
                     </div>
-
                     {paymentMethod === 'mpesa' && (
                       <div className={styles.inputGroup} style={{ marginTop: '1.5rem' }}>
-                        <label htmlFor="mpesaPhone" className={styles.label}>Enter M-Pesa Phone Number</label>
-                        <input
-                          id="mpesaPhone"
-                          type="tel"
-                          required
-                          value={mpesaPhone}
-                          onChange={(e) => setMpesaPhone(e.target.value)}
-                          placeholder="e.g. 0712345678"
-                          className={styles.input}
-                        />
+                        <label className={styles.label}>M-Pesa Phone</label>
+                        <input type="tel" required value={mpesaPhone} onChange={(e) => setMpesaPhone(e.target.value)} className={styles.input} />
                       </div>
                     )}
-
                     <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
-                      <Button variant="outline" onClick={() => setStep(1)} style={{ flex: 1 }}>
-                        Back to Delivery
-                      </Button>
+                      <Button variant="outline" onClick={() => setStep(1)} style={{ flex: 1 }}>Back</Button>
                       <Button variant="primary" onClick={handlePlaceOrderSubmit} style={{ flex: 1 }}>
-                        Place Order (KES {finalTotal.toLocaleString()})
+                        {paymentMethod === 'card' ? `Pay KES ${finalTotal.toLocaleString()}` : `Place Order (KES ${finalTotal.toLocaleString()})`}
                       </Button>
                     </div>
                   </div>
-                )}
+                ) : null}
               </>
             )}
           </div>
-
-          {/* Right Column: Summaries */}
           <aside className={styles.summaryBox}>
             <h2 className={styles.summaryTitle}>Cart Summary</h2>
             <div style={{ maxHeight: '160px', overflowY: 'auto', marginBottom: '1rem' }}>
               {items.map((item, idx) => (
                 <div key={idx} className={styles.summaryItemRow}>
-                  <span style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', maxWidth: '240px' }}>
-                    {item.product.name}
-                  </span>
+                  <span style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', maxWidth: '240px' }}>{item.product.name}</span>
                   <span>KES {(item.product.price * item.quantity).toLocaleString()}</span>
                 </div>
               ))}
             </div>
-
             <div className={styles.summaryDivider} />
-
-            <div className={styles.summaryRow}>
-              <span>Items Total ({totalItems})</span>
-              <span>KES {subtotal.toLocaleString()}</span>
-            </div>
-
-            <div className={styles.summaryRow}>
-              <span>Delivery Fee</span>
-              <span>{deliveryFee() === 0 ? 'FREE' : `KES ${deliveryFee().toLocaleString()}`}</span>
-            </div>
-
-            <div className={styles.summaryTotalRow}>
-              <span>Total</span>
-              <span>KES {finalTotal.toLocaleString()}</span>
-            </div>
+            <div className={styles.summaryRow}><span>Items ({totalItems})</span><span>KES {subtotal.toLocaleString()}</span></div>
+            <div className={styles.summaryRow}><span>Delivery</span><span>{deliveryFee() === 0 ? 'FREE' : `KES ${deliveryFee()}`}</span></div>
+            <div className={styles.summaryTotalRow}><span>Total</span><span>KES {finalTotal.toLocaleString()}</span></div>
           </aside>
         </div>
       )}
-
-      {/* M-Pesa STK Push Prompt simulation Overlay */}
       {showSTKModal && (
         <div className={styles.modalOverlay}>
           <div className={styles.modalContent}>
             <div className={styles.pulseSpinner} />
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 800, marginBottom: '6px' }}>Lipa Na M-Pesa</h3>
-            <p style={{ fontSize: '0.9rem', color: 'var(--color-gray-600)', marginBottom: '1.5rem' }}>
-              An M-Pesa payment prompt (STK Push) has been dispatched to <strong>{mpesaPhone}</strong>. Please enter your M-Pesa PIN on your phone to complete payment.
-            </p>
+            <h3>Lipa Na M-Pesa</h3>
+            <p>Payment prompt sent to <strong>{mpesaPhone}</strong></p>
             <div className={styles.timer}>{stkTimer}s</div>
-            <p style={{ fontSize: '0.8rem', color: 'var(--color-gray-400)' }}>
-              Awaiting automatic confirmation from Safaricom API...
-            </p>
+            <p>Awaiting confirmation...</p>
           </div>
         </div>
       )}

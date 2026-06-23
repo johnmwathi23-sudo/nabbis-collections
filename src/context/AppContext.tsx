@@ -129,6 +129,22 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const loginUser = useCallback(async (email: string) => {
     try {
       const user = await DatabaseService.getUserByEmail(email);
+
+      // Fallback for admin user (works even without Supabase)
+      if (!user && email.toLowerCase() === 'admin@nabbis.com') {
+        const adminUser = {
+          id: 1,
+          name: 'Admin User',
+          email: 'admin@nabbis.com',
+          phone: '+254700000000',
+          role: 'admin' as const,
+          joinedDate: '2024-01-01',
+          orders: [],
+        };
+        setCurrentUser(adminUser);
+        saveToStorage('nabbis_session', adminUser);
+        return adminUser;
+      }
       if (!user) {
         throw new Error('No account found with this email.');
       }

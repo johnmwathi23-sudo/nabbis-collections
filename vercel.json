@@ -4,7 +4,8 @@
   "env": {
     "NODE_ENV": "production",
     "NEXT_PUBLIC_SUPABASE_URL": "https://hwmvtgsvznkgwqcgesmy.supabase.co",
-    "NEXT_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh3bXZ0Z3N2em5rZ3dxY2dlc215Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2MzA0NzUsImV4cCI6MjA5NzIwNjQ3NX0.NKr7CUFsCLqMf15Yja-6Zehm6cYeg-pMyRypgDwykoc"
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh3bXZ0Z3N2em5rZ3dxY2dlc215Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2MzA0NzUsImV4cCI6MjA5NzIwNjQ3NX0.NKr7CUFsCLqMf15Yja-6Zehm6cYeg-pMyRypgDwykoc",
+    "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY": "sb_publishable_c0K5SPHo_kXqUMGHmHzKfA_VHMPSlt-"
   },
   "headers": [
     {
