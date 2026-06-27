@@ -1,73 +1,13 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { loadStripe } from '@stripe/stripe-js';
-import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { useApp } from '../../context/AppContext';
 import { useCart } from '../../context/CartContext';
 import { Button } from '../../components/Button';
 import { DELIVERY_FEES, FREE_DELIVERY_THRESHOLD } from '../../lib/types';
 import styles from './checkout.module.css';
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '');
-
-function CardPaymentForm({ clientSecret, amount, onSuccess, onCancel }: {
-  clientSecret: string;
-  amount: number;
-  onSuccess: () => void;
-  onCancel: () => void;
-}) {
-  const stripe = useStripe();
-  const elements = useElements();
-  const [error, setError] = useState<string | null>(null);
-  const [processing, setProcessing] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!stripe || !elements) return;
-
-    setProcessing(true);
-    setError(null);
-
-    const { error: err } = await stripe.confirmPayment({
-      elements,
-      confirmParams: { return_url: `${window.location.origin}/checkout?success=true` },
-      redirect: 'if_required',
-    });
-
-    if (err) {
-      setError(err.message || 'Payment failed');
-      setProcessing(false);
-    } else {
-      onSuccess();
-    }
-  };
-
-  return (
-    <form onSubmit={handleSubmit}>
-      <div style={{ marginBottom: '1.5rem' }}>
-        <PaymentElement />
-      </div>
-      {error && (
-        <div style={{ color: '#dc2626', fontSize: '0.875rem', marginBottom: '1rem', padding: '0.75rem', background: '#fef2f2', borderRadius: '6px' }}>
-          {error}
-        </div>
-      )}
-      <div style={{ display: 'flex', gap: '1rem' }}>
-        <Button type="button" variant="outline" onClick={onCancel} disabled={processing} style={{ flex: 1 }}>
-          Back
-        </Button>
-        <Button type="submit" variant="primary" disabled={!stripe || processing} style={{ flex: 1 }}>
-          {processing ? 'Processing...' : `Pay KES ${amount.toLocaleString()}`}
-        </Button>
-      </div>
-    </form>
-  );
-}
-
 export default function CheckoutPage() {
-  const router = useRouter();
   const { currentUser, placeOrder } = useApp();
   const { items, subtotal, totalItems, clearCart } = useCart();
 
@@ -77,11 +17,9 @@ export default function CheckoutPage() {
   const [address, setAddress] = useState('');
   const [city, setCity] = useState('Nairobi');
   const [deliveryType, setDeliveryType] = useState<'nairobi' | 'parcel' | 'pickup'>('nairobi');
-  const [paymentMethod, setPaymentMethod] = useState<'mpesa' | 'airtel' | 'card'>('mpesa');
+  const [paymentMethod, setPaymentMethod] = useState<'mpesa' | 'airtel'>('mpesa');
   const [mpesaPhone, setMpesaPhone] = useState('');
 
-  const [clientSecret, setClientSecret] = useState<string>('');
-  const [loadingIntent, setLoadingIntent] = useState(false);
   const [showSTKModal, setShowSTKModal] = useState(false);
   const [stkTimer, setStkTimer] = useState(15);
   const [placedOrderDetails, setPlacedOrderDetails] = useState<any>(null);
@@ -129,39 +67,9 @@ export default function CheckoutPage() {
     if (step === 1) setStep(2);
   };
 
-  const handleSelectCard = async () => {
-    setPaymentMethod('card');
-    setLoadingIntent(true);
-    try {
-      const res = await fetch('/api/create-payment-intent', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          amount: finalTotal,
-          email: currentUser?.email || '',
-          name: fullName,
-        }),
-      });
-      const data = await res.json();
-      if (data.clientSecret) {
-        setClientSecret(data.clientSecret);
-      }
-    } catch (err) {
-      console.error('Failed to create payment intent:', err);
-    } finally {
-      setLoadingIntent(false);
-    }
-  };
-
   const handlePlaceOrderSubmit = () => {
-    if (paymentMethod === 'mpesa') {
-      setStkTimer(15);
-      setShowSTKModal(true);
-    } else if (paymentMethod === 'card' && clientSecret) {
-      // Card payment handled by form
-    } else {
-      handleCompleteOrderPlacement();
-    }
+    setStkTimer(15);
+    setShowSTKModal(true);
   };
 
   const handleCompleteOrderPlacement = async () => {
@@ -193,9 +101,7 @@ export default function CheckoutPage() {
         <div className={styles.receiptBox}>
           <div className={styles.successIcon}>✓</div>
           <h1 className={styles.receiptTitle}>Order Placed Successfully!</h1>
-          <p className={styles.receiptDesc}>
-            {paymentMethod === 'card' ? 'Your card payment was successful.' : 'Your order has been logged and payment verified.'}
-          </p>
+          <p className={styles.receiptDesc}>Your order has been placed and payment is being processed.</p>
           <div className={styles.receiptSummary}>
             <div className={styles.receiptRow}><span>Order Reference:</span><strong>{placedOrderDetails.id}</strong></div>
             <div className={styles.receiptRow}>
@@ -270,13 +176,6 @@ export default function CheckoutPage() {
                     </div>
                     <Button type="submit" variant="primary" style={{ width: '100%', marginTop: '2rem' }}>Proceed to Payment</Button>
                   </form>
-                ) : step === 2 && paymentMethod === 'card' && clientSecret ? (
-                  <div className={styles.panelCard}>
-                    <h2 className={styles.panelTitle}>Card Payment</h2>
-                    <Elements stripe={stripePromise} options={{ clientSecret }}>
-                      <CardPaymentForm clientSecret={clientSecret} amount={finalTotal} onSuccess={handleCompleteOrderPlacement} onCancel={() => { setStep(1); setClientSecret(''); }} />
-                    </Elements>
-                  </div>
                 ) : step === 2 ? (
                   <div className={styles.panelCard}>
                     <h2 className={styles.panelTitle}>Payment Details</h2>
@@ -287,20 +186,7 @@ export default function CheckoutPage() {
                           <span className={styles.paymentName}>Lipa Na M-Pesa</span>
                           <span className={styles.paymentDesc}>STK Push to your phone</span>
                         </div>
-                      </div>
-                      <div onClick={handleSelectCard} className={`${styles.paymentCard} ${paymentMethod === 'card' ? styles.paymentCardActive : ''}`}>
-                        {loadingIntent ? (
-                          <div className={styles.paymentLogo} style={{ color: 'var(--color-purple)' }}>Loading...</div>
-                        ) : (
-                          <>
-                            <div className={styles.paymentLogo} style={{ color: 'var(--color-purple)' }}>CARDS</div>
-                            <div className={styles.paymentInfo}>
-                              <span className={styles.paymentName}>Visa / Mastercard</span>
-                              <span className={styles.paymentDesc}>Secure card payment</span>
-                            </div>
-                          </>
-                        )}
-                      </div>
+                    </div>
                     </div>
                     {paymentMethod === 'mpesa' && (
                       <div className={styles.inputGroup} style={{ marginTop: '1.5rem' }}>
@@ -311,7 +197,7 @@ export default function CheckoutPage() {
                     <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
                       <Button variant="outline" onClick={() => setStep(1)} style={{ flex: 1 }}>Back</Button>
                       <Button variant="primary" onClick={handlePlaceOrderSubmit} style={{ flex: 1 }}>
-                        {paymentMethod === 'card' ? `Pay KES ${finalTotal.toLocaleString()}` : `Place Order (KES ${finalTotal.toLocaleString()})`}
+                        Place Order (KES {finalTotal.toLocaleString()})
                       </Button>
                     </div>
                   </div>
