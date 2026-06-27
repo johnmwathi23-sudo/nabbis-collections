@@ -63,52 +63,19 @@
   font-weight: 400;
 }
 
-.searchWrapper {
-  flex: 1;
-  max-width: 520px;
-}
-
-.searchBar {
+.searchIconBtn {
   display: flex;
   align-items: center;
-  border: 1.5px solid var(--color-gray-400);
-  border-radius: 10px;
-  overflow: hidden;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-  background: var(--color-gray-50);
-  padding-left: var(--spacing-3);
-  gap: var(--spacing-2);
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  color: var(--color-gray-800);
+  transition: color var(--transition-fast);
+  flex-shrink: 0;
 }
 
-.searchBar:focus-within {
-  border-color: var(--color-purple);
-  box-shadow: 0 0 0 3px var(--color-purple-glow);
-}
-
-.searchBar input {
-  flex: 1;
-  padding: 10px 0;
-  border: none;
-  background: transparent;
-  font-family: inherit;
-  font-size: 0.9rem;
-  color: var(--color-gray-900);
-  outline: none;
-}
-
-.searchBtn {
-  background: var(--color-purple);
-  color: var(--color-white);
-  padding: 10px 18px;
-  font-weight: 600;
-  font-size: 0.9rem;
-  border: none;
-  cursor: pointer;
-  transition: background var(--transition-fast);
-}
-
-.searchBtn:hover {
-  background: var(--color-purple-dark);
+.searchIconBtn:hover {
+  color: var(--color-purple);
 }
 
 .actions {
@@ -241,7 +208,6 @@
 .mobileLink:hover { color: var(--color-purple); }
 
 @media (max-width: 900px) {
-  .searchWrapper { max-width: 300px; }
   .catNav { display: none; }
   .menuToggle { display: flex; }
   .actionBtn span { display: none; }
@@ -249,16 +215,11 @@
 
 @media (max-width: 600px) {
   .logo { font-size: 1.1rem; }
-  .searchWrapper { max-width: 160px; flex: 0 1 auto; }
-  .searchBar { gap: 4px; padding-left: 8px; }
-  .searchBtn { padding: 10px 10px; font-size: 0; }
-  .searchBtn::before { content: 'Go'; font-size: 0.8rem; font-weight: 600; }
   .actions { gap: 6px; }
+  .searchIconBtn { width: 36px; height: 36px; }
 }
 
 @media (max-width: 420px) {
-  .searchWrapper { max-width: 100px; }
-  .searchBar input { font-size: 0.8rem; padding: 8px 0; }
   .actions { gap: 2px; }
   .cartBtn { width: 36px; height: 36px; }
 }

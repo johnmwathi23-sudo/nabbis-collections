@@ -1,7 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { SearchIcon, CartIcon, UserIcon, HeartIcon, MenuIcon } from './Icons';
@@ -10,8 +9,6 @@ import styles from './Navbar.module.css';
 export const Navbar: React.FC = () => {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [searchVal, setSearchVal] = useState('');
-  const router = useRouter();
   const { totalItems } = useCart();
   const { count: wishCount } = useWishlist();
 
@@ -36,27 +33,9 @@ export const Navbar: React.FC = () => {
       <div className={`container ${styles.navContainer}`}>
         <Link href="/" className={styles.logo}>Nabbis<span>Collections</span></Link>
 
-        <div className={styles.searchWrapper}>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              if (searchVal.trim()) {
-                router.push(`/shop?search=${encodeURIComponent(searchVal)}`);
-              }
-            }}
-            className={styles.searchBar}
-          >
-            <SearchIcon size={18} color="var(--color-gray-600)" />
-            <input
-              type="text"
-              placeholder="Search products, brands and categories..."
-              aria-label="Search"
-              value={searchVal}
-              onChange={(e) => setSearchVal(e.target.value)}
-            />
-            <button type="submit" className={styles.searchBtn}>Search</button>
-          </form>
-        </div>
+        <Link href="/shop" className={styles.searchIconBtn} aria-label="Search">
+          <SearchIcon size={22} />
+        </Link>
 
         <div className={styles.actions}>
           <Link href="/account" className={styles.actionBtn} aria-label="Account">
