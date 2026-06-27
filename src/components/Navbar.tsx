@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
+import { useApp } from '../context/AppContext';
 import { SearchIcon, CartIcon, UserIcon, HeartIcon, MenuIcon } from './Icons';
 import styles from './Navbar.module.css';
 
@@ -11,6 +12,15 @@ export const Navbar: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const { totalItems } = useCart();
   const { count: wishCount } = useWishlist();
+  const { siteSettings } = useApp();
+
+  const siteName = (() => {
+    const setting = siteSettings.find(s => s.key === 'site_name');
+    return setting?.value || 'Nabbis';
+  })();
+
+  const siteLogoSetting = siteSettings.find(s => s.key === 'site_logo');
+  const logoUrl = siteLogoSetting?.value?.url || null;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -31,7 +41,13 @@ export const Navbar: React.FC = () => {
       </div>
 
       <div className={`container ${styles.navContainer}`}>
-        <Link href="/" className={styles.logo}>Nabbis<span>Collections</span></Link>
+        <Link href="/" className={styles.logo}>
+          {logoUrl ? (
+            <img src={logoUrl} alt={siteName} style={{ height: '36px', width: 'auto' }} />
+          ) : (
+            <>{siteName}<span>Collections</span></>
+          )}
+        </Link>
 
         <Link href="/shop" className={styles.searchIconBtn} aria-label="Search">
           <SearchIcon size={22} />

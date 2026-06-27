@@ -156,3 +156,78 @@
   background: var(--color-white);
   cursor: pointer;
 }
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .title {
+    font-size: 1.4rem;
+  }
+
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-3);
+  }
+
+  .statCard {
+    padding: var(--spacing-4);
+  }
+
+  .statVal {
+    font-size: 1.3rem;
+  }
+
+  .statLabel {
+    font-size: 0.7rem;
+  }
+
+  .sectionCard {
+    padding: var(--spacing-4);
+    border-radius: var(--border-radius-md);
+  }
+
+  .sectionTitle {
+    font-size: 1rem;
+  }
+
+  .th,
+  .td {
+    padding: var(--spacing-2) var(--spacing-3);
+    font-size: 0.8rem;
+    white-space: nowrap;
+  }
+
+  .table {
+    font-size: 0.8rem;
+  }
+
+  .tabNav {
+    gap: var(--spacing-2);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .tabBtn {
+    font-size: 0.85rem;
+    padding: var(--spacing-2) var(--spacing-3);
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .statsGrid {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-2);
+  }
+
+  .statCard {
+    padding: var(--spacing-3);
+  }
+
+  .statVal {
+    font-size: 1.1rem;
+  }
+
+  .sectionCard {
+    padding: var(--spacing-3);
+  }
+}

@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-import { Product, Category, Vendor, Order, User, SiteSetting, HeroSlide, AuditLog, AuditAction, AuditEntity } from './types';
+import { Product, Category, Vendor, Order, User, SiteSetting, HeroSlide, AuditLog, AuditAction, AuditEntity, Permission, SiteContact } from './types';
 
 export class DatabaseService {
   // Products
@@ -397,5 +397,101 @@ export class DatabaseService {
 
     if (error) throw error;
     return data;
+  }
+
+  // Seed: Insert a full product (preserving id, slug, vendor, etc.)
+  static async seedProduct(product: Product): Promise<Product> {
+    const { data, error } = await supabase
+      .from('products')
+      .upsert([product], { onConflict: 'id' })
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  // Permissions
+  static async getPermissions(): Promise<Permission[]> {
+    const { data, error } = await supabase
+      .from('permissions')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data || [];
+  }
+
+  static async getPermissionsByUser(userId: string): Promise<Permission[]> {
+    const { data, error } = await supabase
+      .from('permissions')
+      .select('*')
+      .eq('user_id', userId);
+
+    if (error) throw error;
+    return data || [];
+  }
+
+  static async setPermission(permission: Omit<Permission, 'id' | 'created_at' | 'updated_at'>): Promise<Permission> {
+    const { data, error } = await supabase
+      .from('permissions')
+      .upsert([permission], { onConflict: 'user_id,resource' })
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  static async deletePermission(id: string): Promise<void> {
+    const { error } = await supabase
+      .from('permissions')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+  }
+
+  // Site Contacts
+  static async getSiteContacts(): Promise<SiteContact[]> {
+    const { data, error } = await supabase
+      .from('site_contacts')
+      .select('*')
+      .order('sort_order', { ascending: true });
+
+    if (error) throw error;
+    return data || [];
+  }
+
+  static async createSiteContact(contact: Omit<SiteContact, 'id' | 'created_at' | 'updated_at'>): Promise<SiteContact> {
+    const { data, error } = await supabase
+      .from('site_contacts')
+      .insert([contact])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  static async updateSiteContact(id: string, updates: Partial<SiteContact>): Promise<SiteContact> {
+    const { data, error } = await supabase
+      .from('site_contacts')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  static async deleteSiteContact(id: string): Promise<void> {
+    const { error } = await supabase
+      .from('site_contacts')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
   }
 }

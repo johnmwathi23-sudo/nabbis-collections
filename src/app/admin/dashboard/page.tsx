@@ -4,9 +4,9 @@ import { useRouter } from 'next/navigation';
 import { useApp } from '../../../context/AppContext';
 import styles from './admin.module.css';
 
-type QuickLink = { href: string; label: string; desc: string; color: string; countKey: 'vendors' | 'products' | 'orders' | 'users' | null };
+type QuickLink = { href: string; label: string; desc: string; color: string; countKey: 'vendors' | 'products' | 'orders' | 'users' | null; superOnly?: boolean };
 
-const quickLinks: QuickLink[] = [
+const mainLinks: QuickLink[] = [
   { href: '/admin/vendors', label: 'Vendors', desc: 'Approve, suspend, and manage vendors', color: '#f59e0b', countKey: 'vendors' },
   { href: '/admin/products', label: 'Products', desc: 'Manage product catalog', color: '#10b981', countKey: 'products' },
   { href: '/admin/orders', label: 'Orders', desc: 'View and update order statuses', color: '#ec4899', countKey: 'orders' },
@@ -17,9 +17,15 @@ const quickLinks: QuickLink[] = [
   { href: '/admin/audit-log', label: 'Audit Log', desc: 'Review admin activity history', color: '#64748b', countKey: null },
 ];
 
+const siteManagerLinks: QuickLink[] = [
+  { href: '/admin/contacts', label: 'Contacts', desc: 'Manage phone, email, address & hours', color: '#0891b2', countKey: null },
+  { href: '/admin/permissions', label: 'Permissions', desc: 'Granular admin access control', color: '#7c3aed', countKey: null, superOnly: true },
+];
+
 export default function AdminDashboardPage() {
   const router = useRouter();
   const { currentUser, vendors, products, users, orders } = useApp();
+  const isSuperAdmin = currentUser?.role === 'super_admin';
 
   useEffect(() => {
     if (!currentUser) {
@@ -52,6 +58,39 @@ export default function AdminDashboardPage() {
     }
   };
 
+  const renderLinkGrid = (links: QuickLink[]) => (
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
+      {links.map((link) => (
+        <div
+          key={link.label}
+          onClick={() => router.push(link.href)}
+          style={{
+            background: 'white',
+            borderRadius: '12px',
+            border: '1px solid var(--color-gray-200)',
+            padding: '1.25rem',
+            cursor: 'pointer',
+            transition: 'all 0.15s',
+            boxShadow: 'var(--shadow-sm)',
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-md)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+          onMouseLeave={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-sm)'; e.currentTarget.style.transform = 'none'; }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+            <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: link.color + '20', display: 'flex', alignItems: 'center', justifyContent: 'center', color: link.color, fontWeight: 700, fontSize: '1.2rem' }}>
+              {link.label[0]}
+            </div>
+            {link.countKey && (
+              <span style={{ fontSize: '1.5rem', fontWeight: 800, color: link.color }}>{getCount(link.countKey)}</span>
+            )}
+          </div>
+          <h3 style={{ fontSize: '0.95rem', fontWeight: 700, marginBottom: '0.25rem' }}>{link.label}</h3>
+          <p style={{ fontSize: '0.8rem', color: 'var(--color-gray-600)' }}>{link.desc}</p>
+        </div>
+      ))}
+    </div>
+  );
+
   return (
     <div>
       <div className={styles.titleRow}>
@@ -81,42 +120,21 @@ export default function AdminDashboardPage() {
       </div>
 
       <h2 style={{ fontSize: '1.25rem', fontWeight: 800, marginBottom: '1rem', color: 'var(--color-black)' }}>Quick Actions</h2>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
-        {quickLinks.map((link) => (
-          <div
-            key={link.label}
-            onClick={() => router.push(link.href)}
-            style={{
-              background: 'white',
-              borderRadius: '12px',
-              border: '1px solid var(--color-gray-200)',
-              padding: '1.25rem',
-              cursor: 'pointer',
-              transition: 'all 0.15s',
-              boxShadow: 'var(--shadow-sm)',
-            }}
-            onMouseEnter={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-md)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-sm)'; e.currentTarget.style.transform = 'none'; }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-              <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: link.color + '20', display: 'flex', alignItems: 'center', justifyContent: 'center', color: link.color, fontWeight: 700, fontSize: '1.2rem' }}>
-                {link.label[0]}
-              </div>
-              {link.countKey && (
-                <span style={{ fontSize: '1.5rem', fontWeight: 800, color: link.color }}>{getCount(link.countKey)}</span>
-              )}
-            </div>
-            <h3 style={{ fontSize: '0.95rem', fontWeight: 700, marginBottom: '0.25rem' }}>{link.label}</h3>
-            <p style={{ fontSize: '0.8rem', color: 'var(--color-gray-600)' }}>{link.desc}</p>
-          </div>
-        ))}
-      </div>
+      {renderLinkGrid(mainLinks)}
+
+      {isSuperAdmin && (
+        <>
+          <h2 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '1rem', color: 'var(--color-purple-dark)' }}>Site Manager</h2>
+          {renderLinkGrid(siteManagerLinks)}
+        </>
+      )}
 
       <div style={{ background: '#f7fafc', padding: '1.5rem', borderRadius: '8px', borderLeft: '4px solid var(--color-purple)' }}>
         <h3 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '6px' }}>System Overview</h3>
         <p style={{ fontSize: '0.9rem', color: 'var(--color-gray-600)', lineHeight: '1.6' }}>
           Welcome to the Nabbis Collections admin panel. Use the sidebar to navigate between management sections.
-          From here you can manage vendors, products, orders, users, site settings, hero slides, and more.
+          From here you can manage vendors, products, orders, users, site settings, hero slides, contacts, permissions, and more.
+          {isSuperAdmin ? ' As a super admin, you have access to all site management features including permissions and contacts.' : ''}
         </p>
       </div>
     </div>

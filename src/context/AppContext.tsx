@@ -1,6 +1,6 @@
 'use client';
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
-import { Product, Vendor, Order, User, CartItem, DeliveryType, PaymentMethod, SiteSetting, HeroSlide, AuditLog, AuditAction, AuditEntity } from '../lib/types';
+import { Product, Vendor, Order, User, CartItem, DeliveryType, PaymentMethod, SiteSetting, HeroSlide, AuditLog, AuditAction, AuditEntity, Permission, SiteContact } from '../lib/types';
 import { DatabaseService } from '../lib/database';
 
 interface AppContextType {
@@ -32,6 +32,17 @@ interface AppContextType {
   deleteHeroSlide: (id: string) => Promise<void>;
   updateProfileRole: (id: string, role: string) => Promise<void>;
   createAuditEntry: (action: AuditAction, entity: AuditEntity, entityId?: string, changes?: Record<string, any>) => Promise<void>;
+  // Permissions
+  permissions: Permission[];
+  loadPermissions: () => Promise<void>;
+  setPermission: (perm: Omit<Permission, 'id' | 'created_at' | 'updated_at'>) => Promise<void>;
+  deletePermission: (id: string) => Promise<void>;
+  // Contacts
+  siteContacts: SiteContact[];
+  loadSiteContacts: () => Promise<void>;
+  createSiteContact: (contact: Omit<SiteContact, 'id' | 'created_at' | 'updated_at'>) => Promise<void>;
+  updateSiteContact: (id: string, updates: Partial<SiteContact>) => Promise<void>;
+  deleteSiteContact: (id: string) => Promise<void>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -56,6 +67,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [heroSlides, setHeroSlides] = useState<HeroSlide[]>([]);
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
   const [profiles, setProfiles] = useState<any[]>([]);
+  const [permissions, setPermissions] = useState<Permission[]>([]);
+  const [siteContacts, setSiteContacts] = useState<SiteContact[]>([]);
 
   useEffect(() => {
     if (!isClient) return;
@@ -431,6 +444,54 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   }, [currentUser]);
 
+  // Permissions
+  const loadPermissions = useCallback(async () => {
+    try {
+      const data = await DatabaseService.getPermissions();
+      setPermissions(data);
+    } catch (error) {
+      console.error('Failed to load permissions:', error);
+    }
+  }, []);
+
+  const setPermissionCb = useCallback(async (perm: Omit<Permission, 'id' | 'created_at' | 'updated_at'>) => {
+    const created = await DatabaseService.setPermission(perm);
+    setPermissions(prev => {
+      const filtered = prev.filter(p => !(p.user_id === created.user_id && p.resource === created.resource));
+      return [...filtered, created];
+    });
+  }, []);
+
+  const deletePermissionCb = useCallback(async (id: string) => {
+    await DatabaseService.deletePermission(id);
+    setPermissions(prev => prev.filter(p => p.id !== id));
+  }, []);
+
+  // Contacts
+  const loadSiteContacts = useCallback(async () => {
+    try {
+      const data = await DatabaseService.getSiteContacts();
+      setSiteContacts(data);
+    } catch (error) {
+      console.error('Failed to load site contacts:', error);
+    }
+  }, []);
+
+  const createSiteContactCb = useCallback(async (contact: Omit<SiteContact, 'id' | 'created_at' | 'updated_at'>) => {
+    const created = await DatabaseService.createSiteContact(contact);
+    setSiteContacts(prev => [...prev, created]);
+  }, []);
+
+  const updateSiteContactCb = useCallback(async (id: string, updates: Partial<SiteContact>) => {
+    const updated = await DatabaseService.updateSiteContact(id, updates);
+    setSiteContacts(prev => prev.map(c => c.id === id ? updated : c));
+  }, []);
+
+  const deleteSiteContactCb = useCallback(async (id: string) => {
+    await DatabaseService.deleteSiteContact(id);
+    setSiteContacts(prev => prev.filter(c => c.id !== id));
+  }, []);
+
   return (
     <AppContext.Provider value={{
       products,
@@ -461,6 +522,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
       deleteHeroSlide,
       updateProfileRole,
       createAuditEntry,
+      // Permissions
+      permissions,
+      loadPermissions,
+      setPermission: setPermissionCb,
+      deletePermission: deletePermissionCb,
+      // Contacts
+      siteContacts,
+      loadSiteContacts,
+      createSiteContact: createSiteContactCb,
+      updateSiteContact: updateSiteContactCb,
+      deleteSiteContact: deleteSiteContactCb,
     }}>
       {children}
     </AppContext.Provider>

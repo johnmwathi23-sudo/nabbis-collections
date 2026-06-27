@@ -138,3 +138,23 @@ export interface AuditLog {
   user_agent: string | null;
   created_at: string;
 }
+
+export interface Permission {
+  id: string;
+  user_id: string;
+  resource: string;
+  actions: string[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SiteContact {
+  id: string;
+  label: string;
+  type: 'phone' | 'email' | 'address' | 'social' | 'hours';
+  value: string;
+  sort_order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}

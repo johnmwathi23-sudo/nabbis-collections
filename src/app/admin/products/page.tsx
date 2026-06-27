@@ -6,6 +6,7 @@ import { Button } from '../../../components/Button';
 import { PlusIcon, TrashIcon, EditIcon } from '../../../components/Icons';
 import { Product, ProductBadge } from '../../../lib/types';
 import { DatabaseService } from '../../../lib/database';
+import { PRODUCTS as SEED_PRODUCTS } from '../../../lib/data';
 import styles from '../dashboard/admin.module.css';
 import ImagePicker from '../../../components/ImagePicker';
 
@@ -121,14 +122,24 @@ export default function AdminProductsPage() {
           <h1 style={{ fontSize: '1.75rem', fontWeight: 800, marginBottom: '0.25rem' }}>Product Catalog</h1>
           <p style={{ color: 'var(--color-gray-600)' }}>Manage all products across the platform</p>
         </div>
-        <Button variant="primary" size="sm" onClick={() => {
-          setCreating(true);
-          setEditForm({ name: '', category: 'Fashion & Clothing', price: '', oldPrice: '', stock: '', image: '', description: '', tags: '', badge: '', featured: false, isFlash: false });
-        }}>
-          <PlusIcon size={16} /> New Product
-        </Button>
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <Button variant="outline" size="sm" onClick={async () => {
+            if (!confirm('Seed all products from data.ts into the database? This will update existing products.')) return;
+            for (const p of SEED_PRODUCTS) {
+              try { await DatabaseService.seedProduct(p); } catch (err) { console.error('Failed to seed:', p.name, err); }
+            }
+            window.location.reload();
+          }}>
+            Seed Products
+          </Button>
+          <Button variant="primary" size="sm" onClick={() => {
+            setCreating(true);
+            setEditForm({ name: '', category: 'Fashion & Clothing', price: '', oldPrice: '', stock: '', image: '', description: '', tags: '', badge: '', featured: false, isFlash: false });
+          }}>
+            <PlusIcon size={16} /> New Product
+          </Button>
+        </div>
       </div>
-
       <div className={styles.sectionCard}>
         <table className={styles.table}>
           <thead>

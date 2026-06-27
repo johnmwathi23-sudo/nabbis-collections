@@ -3,6 +3,7 @@
 import React, { useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { Button } from '../components/Button';
+import { useApp } from '../context/AppContext';
 import {
   FashionIcon, FootwearIcon, HomeIcon, BeddingIcon,
   KitchenIcon, BabyIcon, BeautyIcon, HealthIcon,
@@ -12,7 +13,7 @@ import {
 } from '../components/Icons';
 import styles from './page.module.css';
 
-// --- Data ---
+// --- Static Data ---
 const CATEGORIES = [
   { name: 'Fashion & Clothing', icon: FashionIcon },
   { name: 'Footwear',           icon: FootwearIcon },
@@ -25,17 +26,6 @@ const CATEGORIES = [
   { name: 'Fitness & Yoga',     icon: FitnessIcon },
   { name: 'Assistive Devices',  icon: AssistiveIcon },
   { name: 'Lifestyle & Gifts',  icon: GiftIcon },
-];
-
-const PRODUCTS = [
-  { id: 1, name: 'Premium Leather Boots', price: 4500,  oldPrice: 5800,  image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&q=80&w=500', badge: 'Best Seller', vendor: 'Nairobi Styles' },
-  { id: 2, name: 'Elegant Summer Dress',  price: 2800,  oldPrice: null,   image: 'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?auto=format&fit=crop&q=80&w=500', badge: 'New',         vendor: 'KE Fashion Hub' },
-  { id: 3, name: 'Smart Fitness Watch',   price: 3200,  oldPrice: 4200,   image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=80&w=500', badge: 'Sale',        vendor: 'TechGadgets KE' },
-  { id: 4, name: 'Organic Skincare Set',  price: 1500,  oldPrice: null,   image: 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?auto=format&fit=crop&q=80&w=500', badge: null,          vendor: 'Glow Beauty' },
-  { id: 5, name: 'Modern Kitchen Set',    price: 6500,  oldPrice: 8000,   image: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&q=80&w=500', badge: 'Sale',        vendor: 'Home Essentials' },
-  { id: 6, name: 'Kids Comfort Sneakers', price: 1800,  oldPrice: null,   image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&q=80&w=500', badge: 'New',         vendor: 'Baby Steps' },
-  { id: 7, name: 'Linen Bedding Set',     price: 4200,  oldPrice: 5500,   image: 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&q=80&w=500', badge: 'Best Seller', vendor: 'Comfort Living' },
-  { id: 8, name: 'Yoga Mat Premium',      price: 2200,  oldPrice: 2800,   image: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=80&w=500', badge: 'Sale',        vendor: 'FitKenya' },
 ];
 
 const FEATURES = [
@@ -83,6 +73,11 @@ const Reveal: React.FC<{ children: React.ReactNode; className?: string; delay?: 
 
 // --- Page ---
 export default function Home() {
+  const { products } = useApp();
+  const displayProducts = products.filter(p => p.featured).length >= 8
+    ? products.filter(p => p.featured)
+    : products.slice(0, 8);
+
   return (
     <div className={styles.home}>
 
@@ -187,7 +182,7 @@ export default function Home() {
             </div>
           </Reveal>
           <div className={styles.productGrid}>
-            {PRODUCTS.map((product, i) => (
+            {displayProducts.map((product, i) => (
               <Reveal key={product.id} delay={i * 50}>
                 <div className={styles.productCard}>
                   <div className={styles.productImageWrap}>
