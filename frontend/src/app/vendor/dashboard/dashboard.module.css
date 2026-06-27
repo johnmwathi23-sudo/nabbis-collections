@@ -1,0 +1,164 @@
+.container {
+  padding-top: var(--spacing-10);
+  padding-bottom: var(--spacing-12);
+}
+
+.headerRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-8);
+  flex-wrap: wrap;
+  gap: var(--spacing-4);
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--color-black);
+}
+
+/* Stats Cards Grid */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--spacing-6);
+  margin-bottom: var(--spacing-10);
+}
+
+.statCard {
+  background: var(--color-white);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-6);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-gray-200);
+  display: flex;
+  flex-direction: column;
+}
+
+.statLabel {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-gray-600);
+  text-transform: uppercase;
+  margin-bottom: var(--spacing-2);
+}
+
+.statVal {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--color-black);
+}
+
+/* Panel Layout: Products & Orders side by side */
+.dashboardGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-10);
+}
+
+/* Tabs */
+.tabNav {
+  display: flex;
+  gap: var(--spacing-4);
+  margin-bottom: var(--spacing-8);
+  border-bottom: 2px solid var(--color-gray-200);
+}
+
+.tabBtn {
+  padding: var(--spacing-3) var(--spacing-2);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-gray-600);
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  transition: all var(--transition-fast);
+}
+
+.tabBtnActive {
+  color: var(--color-purple);
+  border-color: var(--color-purple);
+}
+
+/* Product list table */
+.sectionCard {
+  background: var(--color-white);
+  border-radius: var(--border-radius-lg);
+  border: 1px solid var(--color-gray-200);
+  box-shadow: var(--shadow-sm);
+  padding: var(--spacing-6);
+  overflow-x: auto;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-6);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.th {
+  padding: var(--spacing-3) var(--spacing-4);
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--color-gray-600);
+  text-transform: uppercase;
+  border-bottom: 2px solid var(--color-gray-200);
+}
+
+.td {
+  padding: var(--spacing-4);
+  font-size: 0.95rem;
+  border-bottom: 1px solid var(--color-gray-200);
+  vertical-align: middle;
+}
+
+.tr:last-child .td {
+  border-bottom: none;
+}
+
+.productName {
+  font-weight: 700;
+  color: var(--color-black);
+}
+
+/* Forms Modal / Card */
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-4);
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-3);
+  margin-top: var(--spacing-6);
+}
+
+/* Order Rows */
+.orderItemRow {
+  padding: var(--spacing-3) 0;
+  border-bottom: 1px solid var(--color-gray-100);
+}
+
+.orderItemRow:last-child {
+  border-bottom: none;
+}
+
+.btnActions {
+  display: flex;
+  gap: var(--spacing-2);
+}
+
+@media (max-width: 768px) {
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+}

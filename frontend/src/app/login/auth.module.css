@@ -1,0 +1,134 @@
+.wrapper {
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-8) 0;
+  position: relative;
+}
+
+.wrapperBg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 10% 20%, rgba(106, 13, 173, 0.08) 0%, transparent 40%),
+              radial-gradient(circle at 90% 80%, rgba(230, 230, 250, 0.4) 0%, transparent 50%);
+  z-index: 1;
+}
+
+.card {
+  width: 100%;
+  max-width: 450px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(106, 13, 173, 0.1);
+  box-shadow: var(--shadow-lg), var(--color-purple-glow);
+  border-radius: var(--border-radius-xl);
+  padding: var(--spacing-8);
+  z-index: 2;
+  animation: scaleIn 0.5s var(--transition-normal) both;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: var(--spacing-6);
+}
+
+.title {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--color-black);
+  margin-bottom: var(--spacing-2);
+}
+
+.subtitle {
+  font-size: 0.9rem;
+  color: var(--color-gray-600);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-gray-800);
+}
+
+.input {
+  width: 100%;
+  padding: 12px var(--spacing-4);
+  border: 1px solid var(--color-gray-400);
+  border-radius: var(--border-radius-md);
+  font-size: 0.95rem;
+  outline: none;
+  background: var(--color-white);
+  transition: all var(--transition-fast);
+}
+
+.input:focus {
+  border-color: var(--color-purple);
+  box-shadow: 0 0 0 3px var(--color-purple-glow);
+}
+
+.select {
+  width: 100%;
+  padding: 12px var(--spacing-4);
+  border: 1px solid var(--color-gray-400);
+  border-radius: var(--border-radius-md);
+  font-size: 0.95rem;
+  background: var(--color-white);
+  outline: none;
+  cursor: pointer;
+  transition: border-color var(--transition-fast);
+}
+
+.select:focus {
+  border-color: var(--color-purple);
+}
+
+.submitBtn {
+  margin-top: var(--spacing-2);
+  width: 100%;
+  height: 46px;
+}
+
+.errorBox {
+  background-color: rgba(211, 47, 47, 0.08);
+  border: 1px solid var(--color-error);
+  color: var(--color-error);
+  padding: var(--spacing-3);
+  border-radius: var(--border-radius-md);
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-align: center;
+}
+
+.footer {
+  text-align: center;
+  margin-top: var(--spacing-6);
+  font-size: 0.9rem;
+  color: var(--color-gray-600);
+}
+
+.footerLink {
+  color: var(--color-purple);
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}

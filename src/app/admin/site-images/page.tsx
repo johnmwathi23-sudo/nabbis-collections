@@ -4,16 +4,19 @@ import { useRouter } from 'next/navigation';
 import { useApp } from '../../../context/AppContext';
 import { Button } from '../../../components/Button';
 import { TrashIcon, PlusIcon, UploadIcon } from '../../../components/Icons';
+import { DatabaseService } from '../../../lib/database';
 import styles from './site-images.module.css';
 
 interface SiteImage {
   id: string;
   name: string;
-  path: string;
-  alt: string;
-  category: 'hero' | 'banner' | 'promo' | 'testimonial' | 'logo' | 'other';
-  uploadedAt: string;
-  size: number;
+  url: string;
+  alt: string | null;
+  category: string;
+  file_size: number | null;
+  mime_type: string | null;
+  uploaded_by: string | null;
+  created_at: string;
 }
 
 export default function SiteImagesManagerPage() {
@@ -25,7 +28,7 @@ export default function SiteImagesManagerPage() {
   const [uploadForm, setUploadForm] = useState({
     name: '',
     alt: '',
-    category: 'other' as 'hero' | 'banner' | 'promo' | 'testimonial' | 'logo' | 'other',
+    category: 'other' as string,
     file: null as File | null,
   });
 
@@ -34,20 +37,32 @@ export default function SiteImagesManagerPage() {
       router.push('/login');
       return;
     }
-    if (currentUser.role !== 'admin') {
+    if (currentUser.role !== 'admin' && currentUser.role !== 'super_admin') {
       router.push('/account');
       return;
     }
-
-    const storedImages = localStorage.getItem('nabbis_site_images');
-    if (storedImages) {
-      setImages(JSON.parse(storedImages));
-    }
+    loadImages();
   }, [currentUser, router]);
+
+  const loadImages = async () => {
+    try {
+      const data = await DatabaseService.getSiteImages();
+      setImages(data);
+    } catch (e) {
+      console.error('Failed to load images:', e);
+    }
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setUploadForm(prev => ({ ...prev, file: e.target.files![0] }));
+      if (!uploadForm.name) {
+        setUploadForm(prev => ({
+          ...prev,
+          file: e.target.files![0],
+          name: e.target.files![0].name.replace(/\.[^/.]+$/, ''),
+        }));
+      }
     }
   };
 
@@ -58,25 +73,22 @@ export default function SiteImagesManagerPage() {
     setUploading(true);
 
     try {
-      const formData = new FormData();
-      formData.append('file', uploadForm.file);
-      formData.append('name', uploadForm.name);
-      formData.append('alt', uploadForm.alt);
-      formData.append('category', uploadForm.category);
+      const bucket = uploadForm.category === 'hero' ? 'hero-images' : 'site-assets';
+      const result = await DatabaseService.uploadImage(uploadForm.file, bucket);
 
-      const response = await fetch('/api/upload-site-image', {
-        method: 'POST',
-        body: formData,
+      await DatabaseService.createSiteImage({
+        name: uploadForm.name || uploadForm.file.name,
+        url: result.path,
+        alt: uploadForm.alt,
+        category: uploadForm.category,
+        file_size: uploadForm.file.size,
+        mime_type: uploadForm.file.type,
+        uploaded_by: String(currentUser!.id),
       });
 
-      if (response.ok) {
-        const newImage = await response.json();
-        const updatedImages = [...images, newImage];
-        setImages(updatedImages);
-        localStorage.setItem('nabbis_site_images', JSON.stringify(updatedImages));
-        setShowUploadForm(false);
-        setUploadForm({ name: '', alt: '', category: 'other', file: null });
-      }
+      setShowUploadForm(false);
+      setUploadForm({ name: '', alt: '', category: 'other', file: null });
+      loadImages();
     } catch (error) {
       console.error('Upload failed:', error);
     } finally {
@@ -84,19 +96,17 @@ export default function SiteImagesManagerPage() {
     }
   };
 
-  const handleDeleteImage = async (imageId: string) => {
-    if (!confirm('Are you sure you want to delete this image?')) return;
+  const handleDeleteImage = async (image: SiteImage) => {
+    if (!confirm(`Delete "${image.name}"?`)) return;
 
     try {
-      const response = await fetch(`/api/upload-site-image?id=${imageId}`, {
-        method: 'DELETE',
-      });
-
-      if (response.ok) {
-        const updatedImages = images.filter(img => img.id !== imageId);
-        setImages(updatedImages);
-        localStorage.setItem('nabbis_site_images', JSON.stringify(updatedImages));
+      const path = image.url.split('/').pop();
+      if (path) {
+        const bucket = image.category === 'hero' ? 'hero-images' : 'site-assets';
+        await DatabaseService.deleteImage(bucket, path);
       }
+      await DatabaseService.deleteSiteImage(image.id);
+      setImages(prev => prev.filter(img => img.id !== image.id));
     } catch (error) {
       console.error('Delete failed:', error);
     }
@@ -114,15 +124,15 @@ export default function SiteImagesManagerPage() {
     return colors[category] || colors.other;
   };
 
-  const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return '0 Bytes';
+  const formatFileSize = (bytes: number | null) => {
+    if (!bytes || bytes === 0) return '0 Bytes';
     const k = 1024;
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
-  if (!currentUser || currentUser.role !== 'admin') {
+  if (!currentUser || (currentUser.role !== 'admin' && currentUser.role !== 'super_admin')) {
     return <div className="container" style={{ padding: '8rem 2rem', textAlign: 'center' }}>Verifying admin authorization...</div>;
   }
 
@@ -165,7 +175,7 @@ export default function SiteImagesManagerPage() {
                 <label className={styles.label}>Category</label>
                 <select
                   value={uploadForm.category}
-                  onChange={(e) => setUploadForm(prev => ({ ...prev, category: e.target.value as any }))}
+                  onChange={(e) => setUploadForm(prev => ({ ...prev, category: e.target.value }))}
                   className={styles.input}
                   style={{ cursor: 'pointer' }}
                 >
@@ -249,8 +259,8 @@ export default function SiteImagesManagerPage() {
             <div key={image.id} className={styles.imageCard}>
               <div className={styles.imagePreview}>
                 <img
-                  src={image.path}
-                  alt={image.alt}
+                  src={image.url}
+                  alt={image.alt || image.name}
                   className={styles.image}
                 />
                 <div className={styles.imageOverlay}>
@@ -265,16 +275,16 @@ export default function SiteImagesManagerPage() {
               <div className={styles.imageInfo}>
                 <h3 className={styles.imageName}>{image.name}</h3>
                 <p className={styles.imageAlt}>
-                  Alt: {image.alt}
+                  Alt: {image.alt || '-'}
                 </p>
                 <div className={styles.imageMeta}>
-                  <span>Uploaded: {new Date(image.uploadedAt).toLocaleDateString()}</span>
-                  <span>Size: {formatFileSize(image.size)}</span>
+                  <span>Uploaded: {new Date(image.created_at).toLocaleDateString()}</span>
+                  <span>Size: {formatFileSize(image.file_size)}</span>
                 </div>
               </div>
               <div className={styles.imageActions}>
                 <button
-                  onClick={() => handleDeleteImage(image.id)}
+                  onClick={() => handleDeleteImage(image)}
                   style={{ color: 'var(--color-error)', cursor: 'pointer' }}
                   aria-label="Delete Image"
                 >

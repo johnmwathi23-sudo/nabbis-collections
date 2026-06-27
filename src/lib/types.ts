@@ -73,8 +73,9 @@ export interface User {
   name: string;
   email: string;
   phone?: string;
+  password?: string;
   avatar?: string;
-  role: 'customer' | 'vendor' | 'admin';
+  role: 'customer' | 'vendor' | 'admin' | 'super_admin';
   orders?: Order[];
   joinedDate: string;
 }
@@ -89,3 +90,51 @@ export const DELIVERY_FEES: Record<DeliveryType, number> = {
 };
 
 export const FREE_DELIVERY_THRESHOLD = 5000;
+
+// Admin types
+export type UserRole = 'customer' | 'admin' | 'super_admin';
+
+export interface SiteSetting {
+  id: string;
+  key: string;
+  value: any;
+  description: string | null;
+  updated_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface HeroSlide {
+  id: string;
+  title: string;
+  subtitle: string | null;
+  cta_text: string | null;
+  cta_link: string | null;
+  desktop_image_url: string | null;
+  mobile_image_url: string | null;
+  overlay_opacity: number;
+  text_color: string;
+  bg_color: string;
+  sort_order: number;
+  is_active: boolean;
+  scheduled_from: string | null;
+  scheduled_to: string | null;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export type AuditAction = 'create' | 'update' | 'delete' | 'login' | 'logout' | 'export' | 'impersonate';
+export type AuditEntity = 'product' | 'category' | 'order' | 'profile' | 'site_setting' | 'hero_slide' | 'delivery_zone' | 'coupon' | 'user_role';
+
+export interface AuditLog {
+  id: string;
+  admin_id: string;
+  action: AuditAction;
+  entity: AuditEntity;
+  entity_id: string | null;
+  changes: Record<string, any>;
+  ip_address: string | null;
+  user_agent: string | null;
+  created_at: string;
+}

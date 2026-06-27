@@ -25,6 +25,7 @@ function ShopContent() {
   const [minRating, setMinRating] = useState<number>(0);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [sortBy, setSortBy] = useState<string>('newest');
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   // Read search parameters on load
   useEffect(() => {
@@ -119,7 +120,14 @@ function ShopContent() {
         <div className={styles.resultsCount}>
           Showing <strong>{sortedProducts.length}</strong> products
         </div>
-        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+          <button
+            onClick={() => setFiltersOpen(true)}
+            className={styles.filterToggle}
+            aria-label="Open filters"
+          >
+            Filters ☰
+          </button>
           <span style={{ fontSize: '0.9rem', color: 'var(--color-gray-600)' }}>Sort By:</span>
           <select
             value={sortBy}
@@ -136,8 +144,13 @@ function ShopContent() {
       </div>
 
       <div className={styles.shopLayout}>
+        {/* Mobile filter backdrop */}
+        {filtersOpen && (
+          <div className={styles.filterBackdrop} onClick={() => setFiltersOpen(false)} />
+        )}
+
         {/* Sidebar Filters */}
-        <aside className={styles.sidebar}>
+        <aside className={`${styles.sidebar} ${filtersOpen ? styles.sidebarOpen : ''}`}>
           <div className={styles.filterSection}>
             <h2 className={styles.filterTitle}>Search</h2>
             <div style={{ position: 'relative' }}>
@@ -167,21 +180,21 @@ function ShopContent() {
           <div className={styles.filterSection}>
             <h2 className={styles.filterTitle}>Categories</h2>
             <div className={styles.catList}>
-              <button
-                onClick={() => setSelectedCategory('All')}
-                className={`${styles.catBtn} ${selectedCategory === 'All' ? styles.catBtnActive : ''}`}
-              >
-                All Categories
-              </button>
-              {CATEGORIES.map(cat => (
                 <button
-                  key={cat.id}
-                  onClick={() => setSelectedCategory(cat.name)}
-                  className={`${styles.catBtn} ${selectedCategory.toLowerCase() === cat.name.toLowerCase() ? styles.catBtnActive : ''}`}
+                  onClick={() => { setSelectedCategory('All'); setFiltersOpen(false); }}
+                  className={`${styles.catBtn} ${selectedCategory === 'All' ? styles.catBtnActive : ''}`}
                 >
-                  {cat.name}
+                  All Categories
                 </button>
-              ))}
+                {CATEGORIES.map(cat => (
+                  <button
+                    key={cat.id}
+                    onClick={() => { setSelectedCategory(cat.name); setFiltersOpen(false); }}
+                    className={`${styles.catBtn} ${selectedCategory.toLowerCase() === cat.name.toLowerCase() ? styles.catBtnActive : ''}`}
+                  >
+                    {cat.name}
+                  </button>
+                ))}
             </div>
           </div>
 
@@ -214,7 +227,7 @@ function ShopContent() {
               {[4, 3, 2].map((stars) => (
                 <button
                   key={stars}
-                  onClick={() => setMinRating(stars)}
+                  onClick={() => { setMinRating(stars); setFiltersOpen(false); }}
                   className={`${styles.ratingBtn} ${minRating === stars ? styles.ratingBtnActive : ''}`}
                 >
                   <span>{'★'.repeat(stars)}{'☆'.repeat(5 - stars)}</span>
@@ -222,7 +235,7 @@ function ShopContent() {
                 </button>
               ))}
               <button
-                onClick={() => setMinRating(0)}
+                onClick={() => { setMinRating(0); setFiltersOpen(false); }}
                 className={`${styles.ratingBtn} ${minRating === 0 ? styles.ratingBtnActive : ''}`}
               >
                 All Ratings
@@ -230,7 +243,7 @@ function ShopContent() {
             </div>
           </div>
 
-          <Button variant="outline" size="sm" onClick={handleClearFilters} style={{ width: '100%', marginTop: '1rem' }}>
+          <Button variant="outline" size="sm" onClick={() => { handleClearFilters(); setFiltersOpen(false); }} style={{ width: '100%', marginTop: '1rem' }}>
             Clear All Filters
           </Button>
         </aside>

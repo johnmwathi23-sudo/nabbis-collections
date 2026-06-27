@@ -52,6 +52,16 @@ export const Footer: React.FC = () => {
             <li><Link href="/terms-conditions">Terms & Conditions</Link></li>
           </ul>
         </div>
+
+        <div className={styles.linksSection}>
+          <h4>Account</h4>
+          <ul>
+            <li><Link href="/login">Log In</Link></li>
+            <li><Link href="/register">Register</Link></li>
+            <li><Link href="/account">My Account</Link></li>
+            <li><Link href="/login">Admin Login</Link></li>
+          </ul>
+        </div>
       </div>
       <div className={styles.bottomBar}>
         <div className="container">

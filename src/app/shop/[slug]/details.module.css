@@ -316,3 +316,41 @@
     gap: var(--spacing-6);
   }
 }
+
+@media (max-width: 480px) {
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .price {
+    font-size: 1.5rem;
+  }
+
+  .actionsRow {
+    flex-direction: column;
+  }
+
+  .cartBtn {
+    width: 100%;
+  }
+
+  .metaGrid {
+    grid-template-columns: auto 1fr;
+    font-size: 0.85rem;
+  }
+
+  .qtyBtn {
+    width: 44px;
+    min-height: 44px;
+  }
+
+  .tabHeaders {
+    gap: var(--spacing-3);
+    overflow-x: auto;
+  }
+
+  .tabHeader {
+    font-size: 0.95rem;
+    white-space: nowrap;
+  }
+}

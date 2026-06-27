@@ -1,0 +1,152 @@
+.container {
+  padding-top: var(--spacing-12);
+  padding-bottom: var(--spacing-12);
+}
+
+.header {
+  text-align: center;
+  margin-bottom: var(--spacing-10);
+  animation: fadeUp 0.6s var(--transition-normal) both;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--color-black) 0%, var(--color-purple) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: var(--spacing-2);
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  color: var(--color-gray-600);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--spacing-6);
+  animation: fadeIn 0.8s var(--transition-normal) both;
+}
+
+.card {
+  position: relative;
+  height: 250px;
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-normal);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  background-color: var(--color-gray-100);
+}
+
+.card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-lg), var(--color-purple-glow);
+}
+
+.imageWrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--transition-slow);
+}
+
+.card:hover .image {
+  transform: scale(1.1);
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.3) 50%, rgba(0, 0, 0, 0.1) 100%);
+  z-index: 2;
+  transition: opacity var(--transition-normal);
+}
+
+.card:hover .overlay {
+  background: linear-gradient(to top, rgba(106, 13, 173, 0.9) 0%, rgba(0, 0, 0, 0.4) 60%, rgba(0, 0, 0, 0.15) 100%);
+}
+
+.content {
+  position: relative;
+  z-index: 3;
+  padding: var(--spacing-5);
+  color: var(--color-white);
+}
+
+.cardName {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: var(--spacing-1);
+  color: var(--color-white);
+  transition: transform var(--transition-normal);
+}
+
+.cardDesc {
+  font-size: 0.85rem;
+  opacity: 0.8;
+  margin-bottom: var(--spacing-2);
+  line-height: 1.4;
+  height: 0;
+  overflow: hidden;
+  transition: all var(--transition-normal);
+}
+
+.card:hover .cardDesc {
+  height: 40px;
+  opacity: 1;
+}
+
+.countBadge {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background-color: var(--color-purple);
+  padding: var(--spacing-1) var(--spacing-3);
+  border-radius: 50px;
+  text-transform: uppercase;
+}
+
+.card:hover .countBadge {
+  background-color: var(--color-white);
+  color: var(--color-purple);
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (max-width: 768px) {
+  .title {
+    font-size: 2rem;
+  }
+  
+  .cardDesc {
+    height: auto;
+    opacity: 0.9;
+  }
+}

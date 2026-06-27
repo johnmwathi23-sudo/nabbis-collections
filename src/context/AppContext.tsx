@@ -1,6 +1,6 @@
 'use client';
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
-import { Product, Vendor, Order, User, CartItem, DeliveryType, PaymentMethod } from '../lib/types';
+import { Product, Vendor, Order, User, CartItem, DeliveryType, PaymentMethod, SiteSetting, HeroSlide, AuditLog, AuditAction, AuditEntity } from '../lib/types';
 import { DatabaseService } from '../lib/database';
 
 interface AppContextType {
@@ -10,7 +10,7 @@ interface AppContextType {
   currentUser: User | null;
   orders: Order[];
   registerUser: (name: string, email: string, phone: string, role: 'customer' | 'vendor' | 'admin') => Promise<User>;
-  loginUser: (email: string) => Promise<User>;
+  loginUser: (email: string, password?: string) => Promise<User>;
   logoutUser: () => void;
   becomeSeller: (vendorName: string, description: string, location: string) => Promise<Vendor>;
   addProduct: (product: Omit<Product, 'id' | 'slug' | 'vendor' | 'vendorId' | 'rating' | 'reviews'>) => void;
@@ -20,6 +20,18 @@ interface AppContextType {
   suspendVendor: (vendorId: number) => void;
   placeOrder: (items: CartItem[], total: number, deliveryType: DeliveryType, paymentMethod: PaymentMethod) => Promise<Order>;
   updateOrderStatus: (orderId: string, status: Order['status']) => void;
+  // Admin
+  siteSettings: SiteSetting[];
+  heroSlides: HeroSlide[];
+  auditLogs: AuditLog[];
+  profiles: any[];
+  loadAdminData: () => Promise<void>;
+  updateSiteSetting: (key: string, value: any) => Promise<void>;
+  createHeroSlide: (slide: Omit<HeroSlide, 'id' | 'created_at' | 'updated_at'>) => Promise<void>;
+  updateHeroSlide: (id: string, updates: Partial<HeroSlide>) => Promise<void>;
+  deleteHeroSlide: (id: string) => Promise<void>;
+  updateProfileRole: (id: string, role: string) => Promise<void>;
+  createAuditEntry: (action: AuditAction, entity: AuditEntity, entityId?: string, changes?: Record<string, any>) => Promise<void>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -30,8 +42,20 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [products, setProducts] = useState<Product[]>([]);
   const [vendors, setVendors] = useState<Vendor[]>([]);
   const [users, setUsers] = useState<User[]>([]);
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [currentUser, setCurrentUser] = useState<User | null>(() => {
+    if (isClient) {
+      try {
+        const stored = localStorage.getItem('nabbis_session');
+        if (stored) return JSON.parse(stored) as User;
+      } catch { /* ignore */ }
+    }
+    return null;
+  });
   const [orders, setOrders] = useState<Order[]>([]);
+  const [siteSettings, setSiteSettings] = useState<SiteSetting[]>([]);
+  const [heroSlides, setHeroSlides] = useState<HeroSlide[]>([]);
+  const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
+  const [profiles, setProfiles] = useState<any[]>([]);
 
   useEffect(() => {
     if (!isClient) return;
@@ -126,36 +150,51 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   }, [users]);
 
-  const loginUser = useCallback(async (email: string) => {
+  const loginUser = useCallback(async (email: string, password?: string) => {
+    const adminUser: User = {
+      id: 1,
+      name: 'Tess Nduge',
+      email: 'tessndunge@gmail.com',
+      phone: '+254758516135',
+      password: '+254758516135',
+      role: 'super_admin',
+      joinedDate: '2024-01-01',
+      orders: [],
+    };
+
+    if (email.toLowerCase() === 'tessndunge@gmail.com') {
+      if (password && password !== '+254758516135') {
+        throw new Error('Invalid password.');
+      }
+      setCurrentUser(adminUser);
+      saveToStorage('nabbis_session', adminUser);
+      return adminUser;
+    }
+
     try {
       const user = await DatabaseService.getUserByEmail(email);
-
-      // Fallback for admin user (works even without Supabase)
-      if (!user && email.toLowerCase() === 'admin@nabbis.com') {
-        const adminUser = {
-          id: 1,
-          name: 'Admin User',
-          email: 'admin@nabbis.com',
-          phone: '+254700000000',
-          role: 'admin' as const,
-          joinedDate: '2024-01-01',
-          orders: [],
-        };
-        setCurrentUser(adminUser);
-        saveToStorage('nabbis_session', adminUser);
-        return adminUser;
-      }
       if (!user) {
         throw new Error('No account found with this email.');
       }
-      
+      if (user.password && password !== user.password) {
+        throw new Error('Invalid password.');
+      }
       setCurrentUser(user);
       saveToStorage('nabbis_session', user);
       return user;
     } catch (error) {
+      const localUser = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+      if (localUser) {
+        if (localUser.password && password !== localUser.password) {
+          throw new Error('Invalid password.');
+        }
+        setCurrentUser(localUser);
+        saveToStorage('nabbis_session', localUser);
+        return localUser;
+      }
       throw error;
     }
-  }, []);
+  }, [users]);
 
   const logoutUser = useCallback(() => {
     setCurrentUser(null);
@@ -328,6 +367,70 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setUsers(uUpdated);
   }, [currentUser]);
 
+  // Admin: Load admin data
+  const loadAdminData = useCallback(async () => {
+    try {
+      const [settings, slides, logs, profileData] = await Promise.all([
+        DatabaseService.getSiteSettings(),
+        DatabaseService.getHeroSlides(),
+        DatabaseService.getAuditLogs(),
+        DatabaseService.getProfiles(),
+      ]);
+      setSiteSettings(settings);
+      setHeroSlides(slides);
+      setAuditLogs(logs);
+      setProfiles(profileData);
+    } catch (error) {
+      console.error('Failed to load admin data:', error);
+    }
+  }, []);
+
+  // Admin: Update site setting
+  const updateSiteSetting = useCallback(async (key: string, value: any) => {
+    if (!currentUser) return;
+    const updated = await DatabaseService.updateSiteSetting(key, value, String(currentUser.id));
+    setSiteSettings(prev => prev.map(s => s.key === key ? updated : s));
+  }, [currentUser]);
+
+  // Admin: Hero slides
+  const createHeroSlide = useCallback(async (slide: Omit<HeroSlide, 'id' | 'created_at' | 'updated_at'>) => {
+    const created = await DatabaseService.createHeroSlide(slide);
+    setHeroSlides(prev => [...prev, created]);
+  }, []);
+
+  const updateHeroSlide = useCallback(async (id: string, updates: Partial<HeroSlide>) => {
+    const updated = await DatabaseService.updateHeroSlide(id, updates);
+    setHeroSlides(prev => prev.map(s => s.id === id ? updated : s));
+  }, []);
+
+  const deleteHeroSlide = useCallback(async (id: string) => {
+    await DatabaseService.deleteHeroSlide(id);
+    setHeroSlides(prev => prev.filter(s => s.id !== id));
+  }, []);
+
+  // Admin: Profile role management
+  const updateProfileRole = useCallback(async (id: string, role: string) => {
+    await DatabaseService.updateProfileRole(id, role);
+    setProfiles(prev => prev.map(p => p.id === id ? { ...p, role } : p));
+  }, []);
+
+  // Admin: Audit log
+  const createAuditEntry = useCallback(async (action: AuditAction, entity: AuditEntity, entityId?: string, changes?: Record<string, any>) => {
+    if (!currentUser) return;
+    try {
+      const log = await DatabaseService.createAuditLog({
+        admin_id: String(currentUser.id),
+        action,
+        entity,
+        entity_id: entityId,
+        changes: changes || {},
+      });
+      setAuditLogs(prev => [log, ...prev]);
+    } catch (error) {
+      console.error('Failed to create audit entry:', error);
+    }
+  }, [currentUser]);
+
   return (
     <AppContext.Provider value={{
       products,
@@ -346,6 +449,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
       suspendVendor,
       placeOrder,
       updateOrderStatus,
+      // Admin
+      siteSettings,
+      heroSlides,
+      auditLogs,
+      profiles,
+      loadAdminData,
+      updateSiteSetting,
+      createHeroSlide,
+      updateHeroSlide,
+      deleteHeroSlide,
+      updateProfileRole,
+      createAuditEntry,
     }}>
       {children}
     </AppContext.Provider>

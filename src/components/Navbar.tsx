@@ -25,7 +25,11 @@ export const Navbar: React.FC = () => {
     <header className={`${styles.header} ${scrolled ? styles.scrolled : ''}`}>
       <div className={styles.topBar}>
         <div className="container">
-          <span>🚚 Free Nairobi delivery on orders above KES 5,000 &nbsp;|&nbsp; 📞 +254 700 000 000 &nbsp;|&nbsp; M-Pesa • Airtel Money • Cards</span>
+          <span className={styles.topBarText}>🚚 Free Nairobi delivery on orders above KES 5,000</span>
+          <span className={styles.topBarDivider}>|</span>
+          <span className={styles.topBarPhone}>📞 +254 700 000 000</span>
+          <span className={styles.topBarDivider}>|</span>
+          <span className={styles.topBarPayments}>M-Pesa • Airtel Money • Cards</span>
         </div>
       </div>
 

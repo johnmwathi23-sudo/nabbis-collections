@@ -8,6 +8,27 @@
   letter-spacing: 0.01em;
 }
 
+.topBarText,
+.topBarDivider,
+.topBarPhone,
+.topBarPayments {
+  display: inline;
+}
+
+@media (max-width: 600px) {
+  .topBarDivider,
+  .topBarPhone,
+  .topBarPayments {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .topBarText {
+    font-size: 0.72rem;
+  }
+}
+
 .header {
   background-color: var(--color-white);
   position: sticky;
@@ -227,6 +248,17 @@
 }
 
 @media (max-width: 600px) {
-  .logo { font-size: 1.2rem; }
-  .searchWrapper { max-width: none; flex: 1; }
+  .logo { font-size: 1.1rem; }
+  .searchWrapper { max-width: 160px; flex: 0 1 auto; }
+  .searchBar { gap: 4px; padding-left: 8px; }
+  .searchBtn { padding: 10px 10px; font-size: 0; }
+  .searchBtn::before { content: 'Go'; font-size: 0.8rem; font-weight: 600; }
+  .actions { gap: 6px; }
+}
+
+@media (max-width: 420px) {
+  .searchWrapper { max-width: 100px; }
+  .searchBar input { font-size: 0.8rem; padding: 8px 0; }
+  .actions { gap: 2px; }
+  .cartBtn { width: 36px; height: 36px; }
 }

@@ -10,6 +10,7 @@ export default function LoginPage() {
   const router = useRouter();
   const { currentUser, loginUser } = useApp();
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -36,10 +37,12 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      await loginUser(email);
-      // Redirection is handled by the useEffect above
-    } catch (err: any) {
-      setError(err.message || 'Failed to login');
+      const user = await loginUser(email, password);
+      if (user.role === 'admin' || user.role === 'super_admin') window.location.href = '/admin/dashboard';
+      else if (user.role === 'vendor') window.location.href = '/vendor/dashboard';
+      else window.location.href = '/account';
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to login');
       setLoading(false);
     }
   };
@@ -65,7 +68,19 @@ export default function LoginPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="e.g. customer@nabbis.com or admin@nabbis.com"
+              placeholder="e.g. tessndunge@gmail.com"
+              className={styles.input}
+            />
+          </div>
+
+          <div className={styles.inputGroup}>
+            <label htmlFor="password" className={styles.label}>Password</label>
+            <input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter your password"
               className={styles.input}
             />
           </div>
@@ -75,13 +90,32 @@ export default function LoginPage() {
           </Button>
         </form>
 
-        <div style={{ marginTop: '1.5rem', background: '#edf2f7', padding: '12px', borderRadius: '8px', fontSize: '0.8rem' }}>
-          <p style={{ fontWeight: 'bold', marginBottom: '4px' }}>💡 Quick Test Accounts (Demo):</p>
-          <ul style={{ listStyleType: 'disc', paddingLeft: '16px' }}>
-            <li>Customer: <code>customer@nabbis.com</code></li>
-            <li>Vendor: <code>seller@nabbis.com</code></li>
-            <li>Admin: <code>admin@nabbis.com</code></li>
-          </ul>
+        <div style={{ marginTop: '1.5rem', background: '#f5f3ff', padding: '12px', borderRadius: '8px', fontSize: '0.85rem', border: '1px solid #ddd6fe' }}>
+          <p style={{ fontWeight: 'bold', marginBottom: '8px', color: '#5b21b6' }}>🔐 Admin Access</p>
+          <p style={{ marginBottom: '8px', lineHeight: '1.5' }}>
+            Enter <code style={{ background: '#ede9fe', padding: '2px 6px', borderRadius: '4px' }}>tessndunge@gmail.com</code> with password <code style={{ background: '#ede9fe', padding: '2px 6px', borderRadius: '4px' }}>+254758516135</code> to access the CMS dashboard.
+          </p>
+          <button
+            type="button"
+            onClick={async () => {
+              setEmail('tessndunge@gmail.com');
+              setPassword('+254758516135');
+              setLoading(true);
+              try {
+                const user = await loginUser('tessndunge@gmail.com', '+254758516135');
+                window.location.href = '/admin/dashboard';
+              } catch (err: unknown) {
+                setError(err instanceof Error ? err.message : 'Failed to login');
+                setLoading(false);
+              }
+            }}
+            style={{
+              background: '#5b21b6', color: 'white', border: 'none', padding: '6px 16px',
+              borderRadius: '6px', cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem',
+            }}
+          >
+            Quick Admin Login →
+          </button>
         </div>
 
         <div className={styles.footer}>

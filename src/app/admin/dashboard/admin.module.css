@@ -16,7 +16,7 @@
 /* Stats */
 .statsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: var(--spacing-6);
   margin-bottom: var(--spacing-10);
 }
@@ -98,6 +98,14 @@
   color: var(--color-gray-600);
   text-transform: uppercase;
   border-bottom: 2px solid var(--color-gray-200);
+}
+
+.th:first-child,
+.td:first-child {
+  position: sticky;
+  left: 0;
+  background: inherit;
+  z-index: 1;
 }
 
 .td {

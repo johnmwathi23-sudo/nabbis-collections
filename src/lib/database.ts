@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-import { Product, Category, Vendor, Order, User } from './types';
+import { Product, Category, Vendor, Order, User, SiteSetting, HeroSlide, AuditLog, AuditAction, AuditEntity } from './types';
 
 export class DatabaseService {
   // Products
@@ -241,5 +241,161 @@ export class DatabaseService {
       .remove([path]);
 
     if (error) throw error;
+  }
+
+  // Admin: Site Settings
+  static async getSiteSettings(): Promise<SiteSetting[]> {
+    const { data, error } = await supabase
+      .from('site_settings')
+      .select('*')
+      .order('key', { ascending: true });
+
+    if (error) throw error;
+    return data || [];
+  }
+
+  static async updateSiteSetting(key: string, value: any, updatedBy: string): Promise<SiteSetting> {
+    const { data, error } = await supabase
+      .from('site_settings')
+      .update({ value, updated_by: updatedBy })
+      .eq('key', key)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  // Admin: Hero Slides
+  static async getHeroSlides(): Promise<HeroSlide[]> {
+    const { data, error } = await supabase
+      .from('hero_slides')
+      .select('*')
+      .order('sort_order', { ascending: true });
+
+    if (error) throw error;
+    return data || [];
+  }
+
+  static async createHeroSlide(slide: Omit<HeroSlide, 'id' | 'created_at' | 'updated_at'>): Promise<HeroSlide> {
+    const { data, error } = await supabase
+      .from('hero_slides')
+      .insert([slide])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  static async updateHeroSlide(id: string, updates: Partial<HeroSlide>): Promise<HeroSlide> {
+    const { data, error } = await supabase
+      .from('hero_slides')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  static async deleteHeroSlide(id: string): Promise<void> {
+    const { error } = await supabase
+      .from('hero_slides')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+  }
+
+  // Admin: Audit Log
+  static async getAuditLogs(): Promise<AuditLog[]> {
+    const { data, error } = await supabase
+      .from('admin_audit_log')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data || [];
+  }
+
+  static async createAuditLog(log: {
+    admin_id: string;
+    action: AuditAction;
+    entity: AuditEntity;
+    entity_id?: string;
+    changes?: Record<string, any>;
+    ip_address?: string;
+    user_agent?: string;
+  }): Promise<AuditLog> {
+    const { data, error } = await supabase
+      .from('admin_audit_log')
+      .insert([log])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  // Admin: Site Images
+  static async getSiteImages(category?: string): Promise<any[]> {
+    let query = supabase.from('site_images').select('*');
+    if (category) {
+      query = query.eq('category', category);
+    }
+    const { data, error } = await query.order('created_at', { ascending: false });
+    if (error) throw error;
+    return data || [];
+  }
+
+  static async createSiteImage(image: {
+    name: string;
+    url: string;
+    alt?: string;
+    category?: string;
+    file_size?: number;
+    mime_type?: string;
+    uploaded_by?: string;
+  }): Promise<any> {
+    const { data, error } = await supabase
+      .from('site_images')
+      .insert([image])
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
+  }
+
+  static async deleteSiteImage(id: string): Promise<void> {
+    const { error } = await supabase
+      .from('site_images')
+      .delete()
+      .eq('id', id);
+    if (error) throw error;
+  }
+
+  // Admin: Profiles (for user management)
+  static async getProfiles(): Promise<any[]> {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data || [];
+  }
+
+  static async updateProfileRole(id: string, role: string): Promise<any> {
+    const { data, error } = await supabase
+      .from('profiles')
+      .update({ role })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
   }
 }
