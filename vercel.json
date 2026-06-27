@@ -25,16 +25,5 @@
       ]
     }
   ],
-  "redirects": [
-    {
-      "source": "/admin/dashboard",
-      "destination": "/admin/dashboard/",
-      "permanent": true
-    },
-    {
-      "source": "/vendor/dashboard",
-      "destination": "/vendor/dashboard/",
-      "permanent": true
-    }
-  ]
+  "redirects": []
 }
