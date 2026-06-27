@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '');
+function getStripe(): Stripe {
+  const key = process.env.STRIPE_SECRET_KEY;
+  if (!key) throw new Error('STRIPE_SECRET_KEY is not configured');
+  return new Stripe(key);
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -18,7 +22,7 @@ export async function POST(request: NextRequest) {
     // Amount in cents (Stripe expects smallest currency unit)
     const amountInCents = Math.round(amount * 100);
 
-    const paymentIntent = await stripe.paymentIntents.create({
+    const paymentIntent = await getStripe().paymentIntents.create({
       amount: amountInCents,
       currency: 'kes', // Kenyan Shilling
       receipt_email: email,
